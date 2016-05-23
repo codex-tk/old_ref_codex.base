@@ -12,5 +12,8 @@ if(MSVC)
 	add_compile_options("/wd4127")
 endif()
 
+add_subdirectory( googletest )
+
 add_subdirectory( codex.base )
+
 add_subdirectory( codex.base.tests )
