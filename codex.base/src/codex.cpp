@@ -2,8 +2,8 @@
 
 namespace codex {
 
- int codex0( void ) {
-	return 81;
-}
+  int codex0( void ) {
+    return 81;
+  }
 
 }

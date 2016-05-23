@@ -24,7 +24,12 @@ endif()
 set( SRCS
 	include/codex/predefs.hpp
 	include/codex/codex.hpp
-  src/codex.cpp )
+	include/codex/allocator.hpp )
+
+
+set( SRCS
+  	src/codex.cpp
+		src/allocator.cpp )
 
 add_library( codex.base STATIC ${SRCS} )
 

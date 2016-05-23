@@ -18,6 +18,11 @@ endif()
 
 add_executable( codex.base.tests
 	test_codex.cpp
+	test_allocator.cpp
 )
 
-target_link_libraries( codex.base.tests codex.base gtest gtest_main )
+target_link_libraries( codex.base.tests
+ codex.base
+ gtest
+ gtest_main
+)
