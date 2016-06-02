@@ -21,18 +21,23 @@ else()
 endif()
 
 
-set( SRCS
+set( HEADERS 
 	include/codex/predefs.hpp
 	include/codex/codex.hpp
-	include/codex/allocator.hpp )
+	include/codex/allocator.hpp 
+	include/codex/loop.hpp 
+  include/codex/operation.hpp
+  )
 
 
 set( SRCS
   	src/codex.cpp
-		src/allocator.cpp )
+		src/allocator.cpp 
+    src/loop.cpp
+    )
 
-add_library( codex.base STATIC ${SRCS} )
+  add_library( codex.base STATIC ${HEADERS} ${SRCS} )
 
 if ( CODEX_SHARED )
-	add_library( codex.base.shared SHARED ${SRCS} )
+  add_library( codex.base.shared SHARED ${HEADERS} ${SRCS} )
 endif()
