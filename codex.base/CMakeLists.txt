@@ -20,6 +20,25 @@ else()
 	add_definitions( -Wall -std=c++11 -o2 -g -ggdb )
 endif()
 
+if ( MSVC )
+
+else()
+  if ( APPLE )
+    set( PLATFORM_DEPEND_HEADERS 
+      include/codex/reactor/kqueue.hpp
+    )
+    set( PLATFORM_DEPEND_SRCS 
+      src/reactor/kqueue.cpp
+    )
+  else()
+    set( PLATFORM_DEPEND_HEADERS 
+      include/codex/reactor/epoll.hpp
+    )
+    set( PLATFORM_DEPEND_SRCS 
+      src/reactor/epoll.cpp
+    )
+  endif()
+endif()
 
 set( HEADERS 
 	include/codex/predefs.hpp
@@ -27,6 +46,11 @@ set( HEADERS
 	include/codex/allocator.hpp 
 	include/codex/loop.hpp 
   include/codex/operation.hpp
+  include/codex/slist.hpp
+  include/codex/reactor/reactor.hpp
+  ${PLATFORM_DEPEND_HEADERS}
+  include/codex/pipe.hpp
+  include/codex/reactor/pipe_wakeup.hpp
   )
 
 
@@ -34,6 +58,10 @@ set( SRCS
   	src/codex.cpp
 		src/allocator.cpp 
     src/loop.cpp
+    src/reactor/reactor.cpp
+    ${PLATFORM_DEPEND_SRCS}
+    src/pipe.cpp
+    src/reactor/pipe_wakeup.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

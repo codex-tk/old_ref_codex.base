@@ -17,6 +17,8 @@
 
 #endif
 
+#include <errno.h>
+
 #include <iostream>
 #include <mutex>
 #include <atomic>

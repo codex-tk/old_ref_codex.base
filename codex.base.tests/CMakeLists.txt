@@ -20,6 +20,7 @@ add_executable( codex.base.tests
 	test_codex.cpp
 	test_allocator.cpp
   test_loop.cpp
+  test_reactor.cpp
 )
 
 target_link_libraries( codex.base.tests

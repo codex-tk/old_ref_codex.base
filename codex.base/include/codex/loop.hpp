@@ -7,6 +7,7 @@
 
 #include <codex/codex.hpp>
 #include <codex/operation.hpp>
+#include <codex/slist.hpp>
 
 namespace codex{
 
@@ -15,7 +16,6 @@ namespace codex{
   class loop {
   public:
     typedef codex::operation< void () > operation_type;
-    typedef typename operation_type::pointer_type operation_ptr;
   public:
     /**
      */
@@ -30,25 +30,14 @@ namespace codex{
 
     /**
      */
-    void post( const operation_ptr& ptr ); 
+    void post( operation_type* ptr ); 
   private:
     /**
      */
-    void drain_ops(void);
-
-  public:
-    /**
-     */
-    template < class Handler >
-    static operation_ptr wrap( Handler&& h ) {
-      return operation_type::make_shared( 
-          std::forward< Handler >(h));
-    }
-
+    int drain_ops(void);
   private:
     codex::threading::mutex _lock;
-    std::shared_ptr< std::vector< operation_ptr > > _ops;
-    std::shared_ptr< std::vector< operation_ptr > > _ops_reserve;
+    codex::slist< operation_type > _ops;
   };
 }
 

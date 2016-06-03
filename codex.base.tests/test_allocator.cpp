@@ -2,7 +2,7 @@
 #include <codex/codex.hpp>
 #include <codex/allocator.hpp>
 
-TEST( test , allocator ) {
+TEST( allocator , alloc_free ) {
   codex::allocator allocator;
   allocator.free(allocator.alloc(32));
 }

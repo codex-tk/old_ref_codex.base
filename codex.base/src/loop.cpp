@@ -5,44 +5,34 @@
 namespace codex{
 
   loop::loop( void )
-    : _ops( new std::vector< operation_ptr >())
-    , _ops_reserve( new std::vector< operation_ptr >())
   {
-    // pre allocate ops vector
-    _ops->reserve(256);
-    _ops_reserve->reserve(256);
   }
 
   loop::~loop( void ) {
   }
 
   int loop::dispatch( void ) {
-    drain_ops();
-    return 0;
+    return drain_ops();
   }
   
-  void loop::post( const loop::operation_ptr& ptr ){
+  void loop::post( operation_type* ptr ){
     codex::threading::lock_guard< codex::threading::mutex > guard(_lock);
-    _ops->push_back(ptr);
+    _ops.add_tail( ptr );
   }
 
-  void loop::drain_ops( void ) {
-    bool run_ops = false;
+  int loop::drain_ops( void ) {
+    int drains = 0;
+    codex::slist< operation_type > drain_ops_list;
     do {
       codex::threading::lock_guard< codex::threading::mutex > guard(_lock);
-      run_ops = !_ops->empty();
-      if ( run_ops ) {
-        // swap for prevent allocation
-        _ops.swap( _ops_reserve );
-      }
+      _ops.swap( drain_ops_list );
     } while (0);
-    if ( run_ops ) {
-      for ( auto it : (*_ops_reserve) ) {
-        (*it)();
-      }
-      _ops_reserve->clear();
+    while( drain_ops_list.head() ) {
+      operation_type* op = drain_ops_list.remove_head();
+      (*op)();
+      ++drains;
     }
-
+    return drains;
   }
 
 }
