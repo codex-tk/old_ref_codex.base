@@ -14,18 +14,17 @@ namespace codex { namespace reactor {
     ::close( _epoll_fd );
   }
 
-  bool epoll::bind( int fd 
-      , const int events
-      , reactor::event_handler* handler )
+  int epoll::bind( int fd 
+      , reactor::poll_handler* handler )
   {
     epoll_event evt;
-    evt.events = events;
+    evt.events = handler->events();
     evt.data.ptr = handler;
     if ( epoll_ctl( _epoll_fd , EPOLL_CTL_MOD , fd , &evt ) == 0 )
-      return true;
+      return 0;
     if ( errno == ENOENT )
       return epoll_ctl( _epoll_fd , EPOLL_CTL_ADD , fd , &evt ) == 0;
-    return false;
+    return -1;
   }
 
   void epoll::unbind( int fd ){
@@ -39,7 +38,7 @@ namespace codex { namespace reactor {
       return errno == EINTR ? 0 : -1;
     else {
       for ( int i = 0; i < r ; ++i ) {
-        reactor::event_handler* handler = static_cast< reactor::event_handler* >(
+        reactor::poll_handler* handler = static_cast< reactor::poll_handler* >(
             events[i].data.ptr );
         if ( handler ) {
           (*handler)( events[i].events );

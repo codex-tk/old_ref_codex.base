@@ -7,6 +7,7 @@ namespace codex { namespace reactor {
   pipe_wakeup::pipe_wakeup( void )
     : _handler( &pipe_wakeup::handler_callback )
   {
+    _handler.events( codex::reactor::pollin );
   }
   
   pipe_wakeup::~pipe_wakeup( void ){
@@ -18,23 +19,23 @@ namespace codex { namespace reactor {
   }
 
   void pipe_wakeup::reset( void ) {
-    char ch;
-    ::read( _pipe.read_pipe() , &ch , 1 );
+    char buf[64];
+    ::read( _pipe.read_pipe() , buf , 64 );
   }
 
   int pipe_wakeup::handle( void ) {
     return _pipe.read_pipe();
   }
 
-  codex::reactor::event_handler* pipe_wakeup::handler( void ) {
+  codex::reactor::poll_handler* pipe_wakeup::handler( void ) {
     return &_handler;
   }
 
-  void pipe_wakeup::handler_callback( codex::reactor::event_handler* ev 
-      , const int events ) 
+  void pipe_wakeup::handler_callback( codex::reactor::poll_handler* ev 
+      , const int polls ) 
   {
     pipe_wakeup* ptr = codex::container_of( ev , &pipe_wakeup::_handler );
-    if ( events & codex::reactor::pollin ) 
+    if ( polls & codex::reactor::pollin ) 
       ptr->reset();
   }
   

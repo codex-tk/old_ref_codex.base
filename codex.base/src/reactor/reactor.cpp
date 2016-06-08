@@ -2,19 +2,24 @@
 
 namespace codex { namespace reactor {
 
-  event_handler::event_handler( callback cb )
-    : _callback( cb )
-  {
+  engine::engine( void ) {
+    _poller.bind( _wakeup.handle() , _wakeup.handler() );
   }
 
-  event_handler::~event_handler( void ){
-
+  engine::~engine( void ) {
+    _poller.unbind( _wakeup.handle());
   }
 
-  void event_handler::operator()( int events ) {
-    //cassert( _callback != nullptr );
-    if ( _callback )
-      _callback( this , events );
+  poller& engine::reactor( void ) {
+    return _poller;
+  }
+
+  int engine::wait( const int waitms ) {
+    return _poller.wait( waitms );
+  }
+
+  void engine::wakeup( void ) {
+    _wakeup.set();
   }
 
 }}

@@ -51,6 +51,10 @@ set( HEADERS
   ${PLATFORM_DEPEND_HEADERS}
   include/codex/pipe.hpp
   include/codex/reactor/pipe_wakeup.hpp
+  include/codex/reactor/eventfd_wakeup.hpp
+  include/codex/reactor/poll_handler.hpp
+  include/codex/io/ip/tcp/reactor_channel.hpp
+  include/codex/buffer/ctrl_blk.hpp
   )
 
 
@@ -62,6 +66,10 @@ set( SRCS
     ${PLATFORM_DEPEND_SRCS}
     src/pipe.cpp
     src/reactor/pipe_wakeup.cpp
+    src/reactor/eventfd_wakeup.cpp
+    src/reactor/poll_handler.cpp
+    src/io/ip/tcp/reactor_channel.cpp
+    src/buffer/ctrl_blk.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

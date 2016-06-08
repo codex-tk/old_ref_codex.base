@@ -5,21 +5,37 @@
 
 #include <codex/codex.hpp>
 
+#if defined( __codex_linux__ )
+#include <codex/reactor/epoll.hpp>
+#include <codex/reactor/eventfd_wakeup.hpp>
+#else
+
+#endif
+
 namespace codex { namespace reactor {
+namespace{
+#if defined( __codex_linux__ )
+  typedef codex::reactor::epoll poller;
+  typedef codex::reactor::eventfd_wakeup wakeup; 
+#elif defined( __codex_apple__ )
 
-  enum events {
-    pollin = 0x01,
-    pollout = 0x04,
-  };
+#elif defined( __codex_win32__ )
 
-  class event_handler {
+#endif
+}
+
+  class engine{
   public:
-    typedef void (*callback)( event_handler* handler , const int events );
-    event_handler( callback cb );
-    ~event_handler( void );
-    void operator()( int events );
+    engine( void );
+    ~engine( void );
+
+    poller& reactor( void );
+
+    int wait( const int waitms );
+    void wakeup( void );
   private:
-    callback _callback;
+    reactor::poller _poller;
+    reactor::wakeup _wakeup;
   };
 
 }}

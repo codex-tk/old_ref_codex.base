@@ -3,19 +3,17 @@
 #include <codex/reactor/reactor.hpp>
 #include <codex/pipe.hpp>
 
-TEST( reactor , event_handler ) {
-  codex::reactor::event_handler handler(nullptr);
-}
-
 #if defined ( __codex_linux__ )
 #include <codex/reactor/epoll.hpp>
 #include <codex/reactor/pipe_wakeup.hpp>
+#include <codex/reactor/eventfd_wakeup.hpp>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/poll.h>
 typedef codex::reactor::epoll poller;
+typedef codex::reactor::eventfd_wakeup wakeup;
 #endif
 
 TEST( reactor , event_equal ) {
@@ -32,17 +30,20 @@ TEST( reactor , bind ) {
   poller poll;
   int udpfd = socket( AF_INET , SOCK_DGRAM , IPPROTO_UDP );
   ASSERT_TRUE( udpfd != -1 );
-  codex::reactor::event_handler handler( nullptr );
-  ASSERT_TRUE( poll.bind( udpfd , codex::reactor::pollin , &handler ));
+  codex::reactor::poll_handler handler( nullptr );
+  handler.events( codex::reactor::pollin );
+  ASSERT_TRUE( poll.bind( udpfd , &handler ));
   poll.unbind( udpfd );
   ::close( udpfd );
 }
 
-TEST( reactor , pipe_wakeuwakeupp) {
+TEST( reactor , wakeup ) {
   poller poll;
-  codex::reactor::pipe_wakeup wakeup;
-  poll.bind( wakeup.handle() , codex::reactor::pollin , wakeup.handler());
+  wakeup wakeup;
+  poll.bind( wakeup.handle() , wakeup.handler());
   ASSERT_EQ( poll.wait( 100 ) , 0 );
   wakeup.set();
   ASSERT_EQ( poll.wait( 100 ) , 1 );
+  ASSERT_EQ( poll.wait( 100 ) , 0 );
+  poll.unbind( wakeup.handle() );
 } 

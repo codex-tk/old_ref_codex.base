@@ -21,6 +21,8 @@ add_executable( codex.base.tests
 	test_allocator.cpp
   test_loop.cpp
   test_reactor.cpp
+  test_channel.cpp
+  test_buffer.cpp
 )
 
 target_link_libraries( codex.base.tests

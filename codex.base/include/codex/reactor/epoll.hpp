@@ -1,7 +1,9 @@
 /**
  */
+#ifndef __codex_reactor_epoll_h__
+#define __codex_reactor_epoll_h__
 
-#include <codex/reactor/reactor.hpp>
+#include <codex/reactor/poll_handler.hpp>
 
 namespace codex { namespace reactor{
 
@@ -15,9 +17,8 @@ namespace codex { namespace reactor{
     ~epoll(void);
 
     ///
-    bool bind( int fd 
-        , const int events 
-        , reactor::event_handler* handler );
+    int bind( int fd 
+        , reactor::poll_handler* handler );
 
     /// 
     void unbind( int fd );
@@ -29,3 +30,5 @@ namespace codex { namespace reactor{
   };
 
 }}
+
+#endif

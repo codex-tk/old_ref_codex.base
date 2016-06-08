@@ -2,22 +2,22 @@
  * license
  */
 
-#ifndef __codex_reactor_pipe_wakeup_h__
-#define __codex_reactor_pipe_wakeup_h__
+#ifndef __codex_reactor_eventfd_wakeup_h__
+#define __codex_reactor_eventfd_wakeup_h__
 
-#if !defined( __codex_win32__ ) 
-
-#include <codex/pipe.hpp>
+#include <codex/codex.hpp>
 #include <codex/reactor/poll_handler.hpp>
+
+#if defined( __codex_linux__ ) 
 
 namespace codex { namespace reactor {
 
   /**
    */
-  class pipe_wakeup{
+  class eventfd_wakeup{
   public:
-    pipe_wakeup( void );
-    ~pipe_wakeup( void );
+    eventfd_wakeup( void );
+    ~eventfd_wakeup( void );
 
     void set( void );
 
@@ -27,9 +27,9 @@ namespace codex { namespace reactor {
     codex::reactor::poll_handler* handler( void );
   private:
     static void handler_callback( codex::reactor::poll_handler* ev 
-        , const int polls );
+        , const int events );
   private:
-    codex::pipe _pipe; 
+    int _eventfd;
     codex::reactor::poll_handler _handler;
   };
 }}
