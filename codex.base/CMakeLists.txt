@@ -53,8 +53,11 @@ set( HEADERS
   include/codex/reactor/pipe_wakeup.hpp
   include/codex/reactor/eventfd_wakeup.hpp
   include/codex/reactor/poll_handler.hpp
+  include/codex/io/buffer.hpp
   include/codex/io/ip/tcp/reactor_channel.hpp
   include/codex/buffer/ctrl_blk.hpp
+  include/codex/buffer/shared_blk.hpp
+  include/codex/buffer/packetizer.hpp
   )
 
 
@@ -68,8 +71,11 @@ set( SRCS
     src/reactor/pipe_wakeup.cpp
     src/reactor/eventfd_wakeup.cpp
     src/reactor/poll_handler.cpp
+    src/io/buffer.cpp
     src/io/ip/tcp/reactor_channel.cpp
     src/buffer/ctrl_blk.cpp
+    src/buffer/shared_blk.cpp
+    src/buffer/packetizer.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

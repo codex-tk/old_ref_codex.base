@@ -27,7 +27,7 @@ namespace codex { namespace buffer {
     int ref_count( void );
 
     void* ptr( void );
-    std::size_t size( void );
+    std::size_t size( void ) const ;
 
     virtual void _on_destroy( void );
   public:

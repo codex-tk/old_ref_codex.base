@@ -21,6 +21,9 @@ namespace codex { namespace reactor {
 
     int events( void );
     void events( const int evt );
+
+    void set( poll_events e );
+    void clear( poll_events e );
   private:
     callback _callback;
     int _events;

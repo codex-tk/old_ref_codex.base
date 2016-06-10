@@ -25,4 +25,12 @@ namespace codex { namespace reactor {
     _events = evt;
   }
 
+  void poll_handler::set( poll_events e ){
+    _events |= e;
+  }
+
+  void poll_handler::clear( poll_events e ){
+    _events &= ~e;
+  }
+
 }}

@@ -31,7 +31,7 @@ namespace codex { namespace buffer {
     return _ptr;
   }
 
-  std::size_t ctrl_blk::size( void ) {
+  std::size_t ctrl_blk::size( void ) const {
     return _size;
   }
 
