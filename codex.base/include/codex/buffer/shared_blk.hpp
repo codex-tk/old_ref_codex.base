@@ -47,6 +47,9 @@ namespace codex { namespace buffer {
     void clear( void );
 
     void swap( shared_blk& blk );
+
+    int write( void* p , int sz );
+    int read( void* p , int sz );
   private:
     void add_ref( void );
     void release( void );
@@ -66,6 +69,8 @@ namespace codex { namespace buffer {
     , _read(0) , _write(0)
   {
   }
+
+  shared_blk reserve( shared_blk blk , const int sz );
 
 }}
 

@@ -17,3 +17,5 @@ add_subdirectory( googletest )
 add_subdirectory( codex.base )
 
 add_subdirectory( codex.base.tests )
+
+add_subdirectory( exam/echoserver )

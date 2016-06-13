@@ -133,4 +133,27 @@ namespace codex { namespace buffer {
     _read = _write = 0;
   }
 
+  int shared_blk::write( void* p , int sz ) {
+    int write_sz = std::min( sz , static_cast<int>(space()));
+    memcpy( write_ptr() , p , write_sz );
+    write_ptr( write_sz );
+    return write_sz;
+  }
+
+  int shared_blk::read( void* p , int sz ) {
+    int read_sz = std::min( sz , static_cast<int>(length()));
+    memcpy( p , read_ptr() , read_sz );
+    read_ptr( read_sz );
+    return read_sz;
+  }
+
+  shared_blk reserve( shared_blk blk , const int sz ) {
+    if ( static_cast<int>(blk.size()) < sz ) {
+      shared_blk nblk( sz );
+      nblk.write( blk.read_ptr() , blk.length());
+      blk.swap(nblk);
+    }
+    return blk;
+  }
+
 }}

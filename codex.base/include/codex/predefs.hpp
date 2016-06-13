@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <string.h>
 
 #endif
 
@@ -24,6 +25,7 @@
 #include <iostream>
 #include <mutex>
 #include <atomic>
+#include <vector>
 
 #if defined( _WIN32 )
 

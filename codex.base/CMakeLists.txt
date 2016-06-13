@@ -47,17 +47,27 @@ set( HEADERS
 	include/codex/loop.hpp 
   include/codex/operation.hpp
   include/codex/slist.hpp
+  include/codex/timestamp.hpp
+  include/codex/timespan.hpp
+  include/codex/pipe.hpp
   include/codex/reactor/reactor.hpp
   ${PLATFORM_DEPEND_HEADERS}
-  include/codex/pipe.hpp
   include/codex/reactor/pipe_wakeup.hpp
   include/codex/reactor/eventfd_wakeup.hpp
   include/codex/reactor/poll_handler.hpp
   include/codex/io/buffer.hpp
+  include/codex/io/ip/address.hpp
+  include/codex/io/ip/address.ipp
   include/codex/io/ip/tcp/reactor_channel.hpp
+  include/codex/io/ip/tcp/acceptor.hpp
   include/codex/buffer/ctrl_blk.hpp
   include/codex/buffer/shared_blk.hpp
   include/codex/buffer/packetizer.hpp
+  include/codex/log/record.hpp
+  include/codex/log/writer.hpp
+  include/codex/log/logger.hpp
+  include/codex/log/formatter.hpp
+  include/codex/log/console_writer.hpp
   )
 
 
@@ -68,14 +78,22 @@ set( SRCS
     src/reactor/reactor.cpp
     ${PLATFORM_DEPEND_SRCS}
     src/pipe.cpp
+    src/timestamp.cpp
+    src/timespan.cpp
     src/reactor/pipe_wakeup.cpp
     src/reactor/eventfd_wakeup.cpp
     src/reactor/poll_handler.cpp
     src/io/buffer.cpp
     src/io/ip/tcp/reactor_channel.cpp
+    src/io/ip/tcp/acceptor.cpp
     src/buffer/ctrl_blk.cpp
     src/buffer/shared_blk.cpp
     src/buffer/packetizer.cpp
+    src/log/record.cpp
+    src/log/writer.cpp
+    src/log/logger.cpp
+    src/log/formatter.cpp
+    src/log/console_writer.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

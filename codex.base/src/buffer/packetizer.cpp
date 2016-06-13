@@ -35,7 +35,7 @@ namespace codex { namespace buffer {
   shared_blk random_packetizer::packet( void ) {
     buffer::shared_blk blk( _blk.size() );
     _blk.swap( blk );
-    return _blk;
+    return blk;
   }
 
   void random_packetizer::clear( void ) {
