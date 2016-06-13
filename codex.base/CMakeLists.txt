@@ -59,6 +59,7 @@ set( HEADERS
   include/codex/io/ip/address.hpp
   include/codex/io/ip/address.ipp
   include/codex/io/ip/tcp/reactor_channel.hpp
+  include/codex/io/ip/tcp/reactor_channel_builder.hpp
   include/codex/io/ip/tcp/acceptor.hpp
   include/codex/buffer/ctrl_blk.hpp
   include/codex/buffer/shared_blk.hpp
@@ -86,6 +87,7 @@ set( SRCS
     src/reactor/poll_handler.cpp
     src/io/buffer.cpp
     src/io/ip/tcp/reactor_channel.cpp
+    src/io/ip/tcp/reactor_channel_builder.cpp
     src/io/ip/tcp/acceptor.cpp
     src/buffer/ctrl_blk.cpp
     src/buffer/shared_blk.cpp

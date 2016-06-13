@@ -1,6 +1,9 @@
 #include <codex/buffer/ctrl_blk.hpp>
 
 namespace codex { namespace buffer {
+namespace {
+  codex::allocator ctrl_blk_allocator;
+}
   
   ctrl_blk::ctrl_blk( void* p , const std::size_t sz ) 
     : _ref_count(1) , _ptr(p) , _size(sz)
@@ -37,11 +40,11 @@ namespace codex { namespace buffer {
 
   void ctrl_blk::_on_destroy( void ) {
     void* ptr = reinterpret_cast< ctrl_blk* >(_ptr) - 1; 
-    std::free( ptr );
+    ctrl_blk_allocator.free( ptr );
   }
 
   ctrl_blk* make_blk( const std::size_t sz ) {
-    ctrl_blk* blk= reinterpret_cast< ctrl_blk*>(std::malloc( sizeof( ctrl_blk ) + sz ));
+    ctrl_blk* blk= reinterpret_cast< ctrl_blk*>(ctrl_blk_allocator.alloc( sizeof( ctrl_blk ) + sz ));
     new (blk) ctrl_blk( blk + 1 , sz );
     return blk;
   }
@@ -52,6 +55,10 @@ namespace codex { namespace buffer {
       }
     };
     return make_blk( p , sz , null_deleter());
+  }
+
+  void ctrl_blk::set_allocator( const codex::allocator& alloc ) {
+    ctrl_blk_allocator = alloc;
   }
 
 }}

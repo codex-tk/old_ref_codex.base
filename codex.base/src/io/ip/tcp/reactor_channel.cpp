@@ -3,6 +3,7 @@
 #include <codex/io/ip/socket_ops.hpp>
 #include <codex/log/log.hpp>
 #include <codex/diag/error.hpp>
+#include <codex/io/ip/tcp/reactor_channel_builder.hpp>
 
 namespace codex { namespace io { namespace ip { namespace tcp {
 
@@ -16,41 +17,46 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   event_handler::~event_handler(void){
   }
 
-  reactor_channel::reactor_channel( codex::loop& l ) 
-    : reactor_channel( l , std::make_shared< codex::buffer::random_packetizer >( 4096 ))
-  {
+  void event_handler::channel_ptr( tcp::channel_ptr ptr ) {
+    _channel_ptr = ptr;
   }
 
-  reactor_channel::reactor_channel( codex::loop& l 
-      , std::shared_ptr< codex::buffer::packetizer > pkt ) 
-    :  _loop( l )
+  tcp::channel_ptr& event_handler::channel_ptr( void ){
+    return _channel_ptr;
+  }
+
+  void event_handler::on_error0( const std::error_code& ec ){
+    on_error( ec );
+    _channel_ptr.reset();
+  }
+
+  reactor_channel::reactor_channel( void )
+    : _fd(-1)
     , _poll_handler( &reactor_channel::handle_event0 )
-    , _fd(-1)
-    , _packetizer( pkt )
     , _ref_count( k_handle_error_bit | 1 )
+    , _loop( nullptr )
+    , _builder( nullptr )
   {
   }
 
   reactor_channel::~reactor_channel( void ) {
+
   }
 
   codex::loop& reactor_channel::loop( void ) {
-    return _loop;
+    return *_loop;
   }
 
-  int reactor_channel::bind( int fd , std::shared_ptr< event_handler > handler ) {
-    if ( _fd != -1 ) 
-      _loop.engine().reactor().unbind( _fd );
+  int reactor_channel::bind( int fd ) {
     _fd = fd;
-    _poll_handler.set(codex::reactor::pollin);
-    _handler = handler;
+    _poll_handler.events(codex::reactor::pollin);
     codex::io::ip::socket_ops<int>::nonblocking( _fd );
-    return _loop.engine().reactor().bind( _fd , &_poll_handler );
+    return _loop->engine().reactor().bind( _fd , &_poll_handler );
   }
 
   void reactor_channel::close( void ) {
     add_ref();
-    _loop.post_handler( [this]{
+    _loop->post_handler( [this]{
         handle_error( codex::make_error_code( codex::errc::closed_by_user ));
         release();
     });
@@ -60,7 +66,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     if ( blk.length() <= 0 )
       return;
     add_ref();
-    _loop.post_handler( [this,blk]{
+    _loop->post_handler( [this,blk]{
         write0(blk);
         release();
     });
@@ -73,9 +79,32 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   int reactor_channel::release( void ) {
     int cnt = _ref_count.fetch_sub(1);
     if ( cnt == 1 ){
-      delete this;
+      _builder->on_end_reference(this);
     }
     return cnt;
+  }
+
+  void reactor_channel::reset( void ) {
+    _ref_count = k_handle_error_bit | 1;
+    _fd = -1;
+    _write_packets.clear();
+    _handler.reset();
+    _packetizer.reset();
+  }
+
+  void reactor_channel::set_builder( reactor_channel_builder* builder ) {
+    _builder = builder;
+  }
+  void reactor_channel::set_loop( codex::loop* loop ) {
+    _loop = loop;
+  }
+  void reactor_channel::set_packetizer( 
+      const std::shared_ptr< codex::buffer::packetizer >& packetizer ){
+    _packetizer = packetizer;
+  }
+  
+  void reactor_channel::set_handler( const std::shared_ptr< event_handler >& handler ) {
+    _handler = handler;
   }
 
   std::error_code reactor_channel::handle_pollin( void ) {
@@ -133,7 +162,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
       _poll_handler.set( codex::reactor::pollout );
     }
     if ( events != _poll_handler.events() )
-      _loop.engine().reactor().bind( _fd , &_poll_handler );
+      _loop->engine().reactor().bind( _fd , &_poll_handler );
     
     if ( _handler )
       _handler->on_write( on_write , _write_packets.empty() );
@@ -153,13 +182,19 @@ namespace codex { namespace io { namespace ip { namespace tcp {
         if ( _ref_count.compare_exchange_strong(expected,desired))
           break;
       } while(true);
-      _loop.engine().reactor().unbind( _fd );
+      _loop->engine().reactor().unbind( _fd );
       if ( _handler ) {
-        _handler->on_error(ec);
+        _handler->on_error0(ec);
       }
     }
-    if ( ec == codex::errc::closed_by_user )
+    if ( ec == codex::errc::closed_by_user ) {
+      if ( _fd != -1 ) {
+        ip::socket_ops<int>::close( _fd );
+      }
+      _packetizer->clear();
+      _write_packets.clear();
       release();
+    }
   }
 
   void reactor_channel::handle_event0( codex::reactor::poll_handler* p 

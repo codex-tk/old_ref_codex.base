@@ -1,21 +1,18 @@
 #include <codex/codex.hpp>
 #include <codex/loop.hpp>
 #include <codex/io/ip/tcp/acceptor.hpp>
-#include <codex/io/ip/tcp/reactor_channel.hpp>
+#include <codex/io/ip/tcp/reactor_channel_builder.hpp>
 #include <codex/log/log.hpp>
+
 
 class echo_handler : public codex::io::ip::tcp::event_handler{
 public:
-  echo_handler( codex::io::ip::tcp::reactor_channel* chan ) 
-    : _channel(chan){
-  }
   virtual ~echo_handler( void ){
     LOG_D( "echo" , "Delete" );
   }
-
   virtual void on_read( codex::buffer::shared_blk blk ){
     LOG_D( "echo" , "on read : %d" , (int)blk.length());
-    _channel->write(blk);
+    channel_ptr()->write( blk );
   }
 
   virtual void on_write( const int write_bytes , bool flushed ) {
@@ -23,28 +20,43 @@ public:
   }
 
   virtual void on_error( const std::error_code& ec ) {
+    channel_ptr()->close();
     LOG_D( "echo" , "on error: %s" , ec.message().c_str() );
-    _channel->close();
+  }
+};
+
+class builder : public codex::io::ip::tcp::reactor_channel_builder {
+public:
+  builder( codex::loop& l ) : _loop(l){
+  }
+  virtual codex::loop& loop( void ) {
+    return _loop;
+  }
+  virtual std::shared_ptr< codex::io::ip::tcp::event_handler > handler(){
+    return std::make_shared< echo_handler >(); 
   }
 private:
-  codex::io::ip::tcp::reactor_channel* _channel;
+  codex::loop& _loop;
 };
 
 int main( int argv , char* argc[] ) {
   codex::loop l;
+  builder b(l);
   codex::io::ip::tcp::acceptor acceptor(l);
   codex::log::logger::instance().enable( codex::log::debug );
   codex::log::logger::instance().add_writer( codex::log::console_writer::instance());
-  acceptor.open(7543);
-  acceptor.set_on_accept( 
-      [&]( int fd , const codex::io::ip::tcp::address& addr ) {
-        LOG_D( "echo" , "Accept" );
-        codex::io::ip::tcp::reactor_channel* chan =
-          new codex::io::ip::tcp::reactor_channel( l );
-        chan->bind( fd , std::make_shared< echo_handler >(chan));
-      });
-  while ( true ) {
-    l.dispatch(100);
+  if ( acceptor.open(7543) >= 0 ) {
+    LOG_D( "echo" , "open" );
+    acceptor.set_on_accept( 
+        [&]( int fd , const codex::io::ip::tcp::address& addr ) {
+          LOG_D( "echo" , "Accept" );
+          auto chan = b.build();
+          chan->bind( fd );
+        });
+    while ( true ) {
+      int cnt  = l.dispatch(1000);
+    }
   }
+  LOG_D( "echo" , "Error" );
   return 0;
 }

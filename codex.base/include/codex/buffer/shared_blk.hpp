@@ -48,6 +48,24 @@ namespace codex { namespace buffer {
 
     void swap( shared_blk& blk );
 
+    /**
+     * if ( blk.space() < sz ) {
+     *   blk = buffer::reserve( blk.length() + sz );
+     * }
+     * blk.write( p , sz );
+     *
+     * or
+     *
+     * if ( blk.space() < sz ) {
+     *   std::size_t sz0 = blk.length() + sz;
+     *   shared_blk nblk( some_alloc( sz0 ) , sz0 , [] ( void* ptr ) {
+     *     some_deleter(ptr);
+     *   });
+     *   nblk.write( blk.read_ptr() , blk.length());
+     *   nblk.swap(blk);
+     * }
+     * blk.write( p , sz );
+     */
     int write( void* p , int sz );
     int read( void* p , int sz );
   private:

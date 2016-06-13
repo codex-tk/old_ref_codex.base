@@ -5,6 +5,7 @@
 #define __codex_buffer_ctrl_blk_h__
 
 #include <codex/codex.hpp>
+#include <codex/allocator.hpp>
 
 namespace codex { namespace buffer {
 
@@ -35,6 +36,8 @@ namespace codex { namespace buffer {
     friend ctrl_blk* make_blk( void* ptr , const std::size_t sz );
     template < class Deleter >
     friend ctrl_blk* make_blk( void* ptr , const std::size_t sz , Deleter&& d );
+  public:
+    static void set_allocator( const codex::allocator& alloc );
   private:
     codex::threading::atomic<int> _ref_count;
     void* _ptr;

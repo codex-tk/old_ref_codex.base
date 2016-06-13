@@ -1,8 +1,7 @@
 #include <codex/io/ip/tcp/acceptor.hpp>
-
 #include <codex/loop.hpp>
-
 #include <codex/io/ip/socket_ops.hpp>
+#include <codex/log/log.hpp>
 
 namespace codex { namespace io { namespace ip { namespace tcp {
 
@@ -27,6 +26,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
         if ( ip::socket_ops<int>::reuseaddr( _fd ) ) {
           if ( ip::socket_ops<int>::bind( _fd , addr )) {
             if( ip::socket_ops<int>::listen( _fd , SOMAXCONN ) ){
+              _poll_handler.events(codex::reactor::pollin);
               _loop.engine().reactor().bind( _fd , &_poll_handler );
               return 0;
             }
@@ -54,6 +54,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   void acceptor::handle_event0( codex::reactor::poll_handler* p , const int events ) {
+    LOG_D( "acceptor" , "handle" );
     acceptor* obj = codex::container_of( p , &acceptor::_poll_handler );
     if ( obj ) {
       if ( events & codex::reactor::pollin ) 
