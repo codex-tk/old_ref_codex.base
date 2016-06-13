@@ -1,11 +1,8 @@
 #ifndef __codex_io_ip_tcp_reactor_channel_h__
 #define __codex_io_ip_tcp_reactor_channel_h__
 
-#include <memory>
-#include <deque>
-
+#include <codex/codex.hpp>
 #include <codex/reactor/poll_handler.hpp>
-
 #include <codex/buffer/packetizer.hpp>
 
 namespace codex {
@@ -20,12 +17,14 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     virtual ~event_handler( void );
     virtual void on_read( codex::buffer::shared_blk blk ) = 0 ;
     virtual void on_write( const int write_bytes , bool flushed ) = 0;
-    virtual void on_error( void ) = 0;
+    virtual void on_error( const std::error_code& ec ) = 0;
   };
 
   class reactor_channel {
   public:
-    reactor_channel( codex::loop& l  );
+    explicit reactor_channel( codex::loop& l  );
+    reactor_channel( codex::loop& l 
+        , std::shared_ptr< codex::buffer::packetizer > pkt ); 
     ~reactor_channel( void );
 
     codex::loop& loop( void );
@@ -39,9 +38,9 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     int release( void );
   private:
     static void handle_event0( codex::reactor::poll_handler* poll , const int events );
-    int handle_pollin( void );
-    int handle_pollout( void );
-    void handle_error( int ret );
+    std::error_code handle_pollin( void );
+    std::error_code handle_pollout( void );
+    void handle_error( const std::error_code& ec );
     void handle_end_reference( void );
     void write0( codex::buffer::shared_blk blk );
   private:

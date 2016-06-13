@@ -30,6 +30,8 @@ namespace codex {  namespace log {
       case type::warn : SetConsoleTextAttribute( GetStdHandle(STD_OUTPUT_HANDLE) , BLUE  ); break;
       case type::error: SetConsoleTextAttribute( GetStdHandle(STD_OUTPUT_HANDLE) , RED ); break;
       case type::fatal: SetConsoleTextAttribute( GetStdHandle(STD_OUTPUT_HANDLE) , VIOLET ); break;
+      case type::all: break;
+      case type::off: break;
     }
     std::cout << (char*)_buffer.read_ptr() ;
     SetConsoleTextAttribute( GetStdHandle(STD_OUTPUT_HANDLE) , info.wAttributes );  
@@ -48,8 +50,10 @@ namespace codex {  namespace log {
       case type::warn : std::cout << "\033[" << FG_BLUE   << "m"; break;
       case type::error: std::cout << "\033[" << FG_RED    << "m"; break;
       case type::fatal: std::cout << "\033[" << FG_MAGENTA  << "m"; break;
+      case type::all: break;
+      case type::off: break;
     }
-    std::cout << (char*)_buffer.read_ptr() << "\033[" << FG_DEFAULT  << "m" ;
+    std::cout << static_cast<char*>(_buffer.read_ptr()) << "\033[" << FG_DEFAULT  << "m" ;
 #endif
     _buffer.clear();
   }

@@ -22,8 +22,8 @@ public:
     LOG_D( "echo" , "on write: %d" , write_bytes);
   }
 
-  virtual void on_error( void ) {
-    LOG_D( "echo" , "on error");
+  virtual void on_error( const std::error_code& ec ) {
+    LOG_D( "echo" , "on error: %s" , ec.message().c_str() );
     _channel->close();
   }
 private:

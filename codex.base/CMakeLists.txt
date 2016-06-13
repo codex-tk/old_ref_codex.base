@@ -68,6 +68,7 @@ set( HEADERS
   include/codex/log/logger.hpp
   include/codex/log/formatter.hpp
   include/codex/log/console_writer.hpp
+  include/codex/diag/error.hpp
   )
 
 
@@ -94,6 +95,7 @@ set( SRCS
     src/log/logger.cpp
     src/log/formatter.cpp
     src/log/console_writer.cpp
+    src/diag/error.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

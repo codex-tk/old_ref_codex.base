@@ -25,6 +25,9 @@
 #include <iostream>
 #include <mutex>
 #include <atomic>
+#include <system_error>
+#include <memory>
+#include <deque>
 #include <vector>
 
 #if defined( _WIN32 )

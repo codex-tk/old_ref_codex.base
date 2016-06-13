@@ -33,7 +33,7 @@ namespace codex { namespace log {
           , r.function
           , r.file
           , r.line
-          , r.tid
+          , static_cast<int>(r.tid)
       );
     buf.write_ptr( len );
   }
