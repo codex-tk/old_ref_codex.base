@@ -57,6 +57,22 @@ namespace codex { namespace buffer {
     shared_blk _blk;
   };
 
+  class length_packetizer : public packetizer {
+  public:
+    length_packetizer( void );
+    virtual ~length_packetizer( void );
+    virtual int setup( codex::io::buffer* iobufs , int cnt );
+    virtual void assemble( const int readbytes );
+    virtual bool done( void ); 
+    virtual shared_blk packet( void );
+    virtual void clear( void );
+
+    virtual int header_size( void ) = 0;
+    virtual int body_size( void* header_ptr ) = 0;
+    virtual int default_buf_size( void );
+  private:
+    shared_blk _blk;
+  };
 }}
 
 #endif

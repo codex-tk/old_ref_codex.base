@@ -40,6 +40,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
     int bind( int fd );
     void close( void );
+    bool closed( void );
 
     void write( codex::buffer::shared_blk blk );
 

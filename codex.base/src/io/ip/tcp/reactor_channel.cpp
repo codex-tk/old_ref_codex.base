@@ -62,6 +62,10 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     });
   }
 
+  bool reactor_channel::closed( void ) {
+    return ( _ref_count.load() & k_handle_error_bit )  == 0;
+  }
+  
   void reactor_channel::write( codex::buffer::shared_blk blk ){
     if ( blk.length() <= 0 )
       return;
