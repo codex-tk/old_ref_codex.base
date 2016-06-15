@@ -66,32 +66,32 @@ TEST( shared_blk , read_write ) {
   ASSERT_EQ( blk.space() , 32 );
   ASSERT_EQ( blk.size() , 32 );
 
-  ASSERT_EQ( blk.read_ptr(-1) , 0 );
-  ASSERT_EQ( blk.read_ptr(1), 0 );
+  ASSERT_EQ( blk.read_skip(-1) , 0 );
+  ASSERT_EQ( blk.read_skip(1), 0 );
 
   // 0 - read(0) - write(28) - size(32)  
-  ASSERT_EQ( blk.write_ptr(-1) , 0 );
-  ASSERT_EQ( blk.write_ptr(33) , 32 );
-  ASSERT_EQ( blk.write_ptr(-4) , -4 );
+  ASSERT_EQ( blk.write_skip(-1) , 0 );
+  ASSERT_EQ( blk.write_skip(33) , 32 );
+  ASSERT_EQ( blk.write_skip(-4) , -4 );
   ASSERT_EQ( blk.length() , 28 );
 
   // 0 - read(20) - write(28) - size(32)  
-  ASSERT_EQ( blk.read_ptr( 20 ) , 20 );
+  ASSERT_EQ( blk.read_skip( 20 ) , 20 );
   ASSERT_EQ( blk.length() , 8 );
   
   // 0 - read(20) - write(20) - size(32)  
-  ASSERT_EQ( blk.write_ptr( -10 ) , -8 );
+  ASSERT_EQ( blk.write_skip( -10 ) , -8 );
   ASSERT_EQ( blk.length() , 0 );
 
   // 0 - read(20) - write(28) - size(32)  
-  ASSERT_EQ( blk.write_ptr( 8 ) , 8 );
+  ASSERT_EQ( blk.write_skip( 8 ) , 8 );
 
   // 0 - read(0) - write(28) - size(32)
-  ASSERT_EQ( blk.read_ptr( -40 ) , -20 );
+  ASSERT_EQ( blk.read_skip( -40 ) , -20 );
   ASSERT_EQ( blk.length() , 28 );
 
   // 0 - read(28) - write(28) - size(32)
-  ASSERT_EQ( blk.read_ptr( 40 ) , 28 );
+  ASSERT_EQ( blk.read_skip( 40 ) , 28 );
   ASSERT_EQ( blk.length() , 0 );
 
   // 0 - read(0) - write(0) - size(32)  
