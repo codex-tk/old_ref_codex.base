@@ -154,7 +154,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     }
     int on_write = writebytes;
     while ( writebytes > 0 ) {
-      writebytes -= _write_packets.front().read_ptr( writebytes );
+      writebytes -= _write_packets.front().read_skip( writebytes );
       if ( _write_packets.front().length() == 0 ){
         _write_packets.pop_front();
       }

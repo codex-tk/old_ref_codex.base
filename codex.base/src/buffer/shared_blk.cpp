@@ -80,7 +80,7 @@ namespace codex { namespace buffer {
     return ptr + _read;
   }
 
-  int shared_blk::read_ptr( const int m ) {
+  int shared_blk::read_skip( const int m ) {
     int move = m;
     int read = static_cast<int>(_read); 
     read += move;
@@ -107,7 +107,7 @@ namespace codex { namespace buffer {
     return ptr + _write;
   }
 
-  int shared_blk::write_ptr( const int m ) {
+  int shared_blk::write_skip( const int m ) {
     int move = m;
     int write = static_cast<int>(_write); 
     write += move;
@@ -136,14 +136,14 @@ namespace codex { namespace buffer {
   int shared_blk::write( void* p , int sz ) {
     int write_sz = std::min( sz , static_cast<int>(space()));
     memcpy( write_ptr() , p , write_sz );
-    write_ptr( write_sz );
+    write_skip( write_sz );
     return write_sz;
   }
 
   int shared_blk::read( void* p , int sz ) {
     int read_sz = std::min( sz , static_cast<int>(length()));
     memcpy( p , read_ptr() , read_sz );
-    read_ptr( read_sz );
+    read_skip( read_sz );
     return read_sz;
   }
 

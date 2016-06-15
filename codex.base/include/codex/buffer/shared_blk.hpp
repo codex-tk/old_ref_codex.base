@@ -30,14 +30,14 @@ namespace codex { namespace buffer {
     std::size_t size( void ) const;
 
     void* read_ptr( void );
-    int read_ptr( const int move );
+    int read_skip( const int move );
     /**
      * readable data length
      */
     std::size_t length( void ) const;
 
     void* write_ptr( void );
-    int write_ptr( const int move );
+    int write_skip( const int move );
 
     /**
      * writable buffer space

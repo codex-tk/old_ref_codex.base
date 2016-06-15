@@ -17,7 +17,7 @@ namespace codex { namespace log {
     if ( buf.size() < 8192 ) {
       codex::buffer::shared_blk nblk( 8192 );
       memcpy( nblk.write_ptr() , buf.read_ptr() , buf.length() );
-      nblk.write_ptr( buf.length());
+      nblk.write_skip( buf.length());
       nblk.swap(buf);
     }
 #if defined( __codex_win32__ )
@@ -35,7 +35,7 @@ namespace codex { namespace log {
           , r.line
           , static_cast<int>(r.tid)
       );
-    buf.write_ptr( len );
+    buf.write_skip( len );
   }
 
  formatter_ptr default_formatter( void ){

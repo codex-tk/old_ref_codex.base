@@ -25,7 +25,7 @@ namespace codex { namespace buffer {
 
   void random_packetizer::assemble( const int readbytes ) {
     if ( readbytes > 0 )
-      _blk.write_ptr( readbytes );
+      _blk.write_skip( readbytes );
   }
   
   bool random_packetizer::done( void ){
@@ -41,6 +41,7 @@ namespace codex { namespace buffer {
   void random_packetizer::clear( void ) {
     _blk.clear();
   }
+
   length_packetizer::length_packetizer( void  )
   {
     
@@ -69,7 +70,7 @@ namespace codex { namespace buffer {
     return 1;
   }
   void length_packetizer::assemble( const int readbytes ) {
-    _blk.write_ptr(readbytes);
+    _blk.write_skip(readbytes);
   }
 
   bool length_packetizer::done( void ) {
