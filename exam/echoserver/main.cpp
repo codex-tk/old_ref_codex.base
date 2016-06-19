@@ -1,7 +1,7 @@
 #include <codex/codex.hpp>
 #include <codex/loop.hpp>
 #include <codex/io/ip/tcp/acceptor.hpp>
-#include <codex/io/ip/tcp/proactor_channel_builder.hpp>
+#include <codex/io/ip/tcp/channel.hpp>
 #include <codex/log/log.hpp>
 
 #if defined( __codex_win32__ )
@@ -32,7 +32,7 @@ public:
   }
 };
 
-class builder : public codex::io::ip::tcp::proactor_channel_builder {
+class builder : public codex::io::ip::tcp::channel_builder {
 public:
   builder( codex::loop& l ) : _loop(l){
   }
@@ -67,6 +67,7 @@ int main( int argv , char* argc[] ) {
       int cnt  = l.dispatch(1000);
     }
   }
-  LOG_D( "echo" , "Error %s" , std::error_code( GetLastError() , std::system_category()).message().c_str() );
+  LOG_D( "echo" , "Error %s" , std::error_code( GetLastError()
+    , std::system_category()).message().c_str() );
   return 0;
 }

@@ -77,6 +77,7 @@ set( HEADERS
     include/codex/log/console_writer.hpp
     include/codex/diag/error.hpp
     ${PLATFORM_DEPEND_HEADERS}
+		include/codex/io/ip/tcp/channel.hpp
   )
 
 
