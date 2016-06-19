@@ -1,8 +1,15 @@
 #include <codex/codex.hpp>
 #include <codex/loop.hpp>
 #include <codex/io/ip/tcp/acceptor.hpp>
-#include <codex/io/ip/tcp/reactor_channel_builder.hpp>
+#include <codex/io/ip/tcp/proactor_channel_builder.hpp>
 #include <codex/log/log.hpp>
+
+#if defined( __codex_win32__ )
+
+#pragma comment( lib , "ws2_32")
+#pragma comment( lib , "mswsock")
+
+#endif
 
 
 class echo_handler : public codex::io::ip::tcp::event_handler{
@@ -25,7 +32,7 @@ public:
   }
 };
 
-class builder : public codex::io::ip::tcp::reactor_channel_builder {
+class builder : public codex::io::ip::tcp::proactor_channel_builder {
 public:
   builder( codex::loop& l ) : _loop(l){
   }
@@ -40,11 +47,14 @@ private:
 };
 
 int main( int argv , char* argc[] ) {
+#if defined( __codex_win32__ )
+  WSAData ws;
+  WSAStartup(MAKEWORD(2, 2), &ws);
+#endif
   codex::loop l;
   builder b(l);
   codex::io::ip::tcp::acceptor acceptor(l);
   codex::log::logger::instance().enable( codex::log::debug );
-  codex::log::logger::instance().add_writer( codex::log::console_writer::instance());
   if ( acceptor.open(7543) >= 0 ) {
     LOG_D( "echo" , "open" );
     acceptor.set_on_accept( 
@@ -57,6 +67,6 @@ int main( int argv , char* argc[] ) {
       int cnt  = l.dispatch(1000);
     }
   }
-  LOG_D( "echo" , "Error" );
+  LOG_D( "echo" , "Error %s" , std::error_code( GetLastError() , std::system_category()).message().c_str() );
   return 0;
 }

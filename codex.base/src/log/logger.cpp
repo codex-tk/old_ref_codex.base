@@ -1,5 +1,5 @@
 #include <codex/log/logger.hpp>
-//#include <codex/log/console_writer.hpp>
+#include <codex/log/console_writer.hpp>
 #include <stdarg.h>
 
 namespace codex { namespace log {
@@ -110,7 +110,7 @@ namespace codex { namespace log {
   void logger::write( const record& r ) {
 #if defined( __codex_win32__ )
     if ( IsDebuggerPresent() ) {
-      codex::time::systemtime st(r.ts);
+      codex::systemtime st(r.ts);
       char buffer[4096];
       int len = _snprintf_s(buffer , 4096, _TRUNCATE
           , "[%04d%02d%02d %02d%02d%02d][%c][%s][%s]\n" 

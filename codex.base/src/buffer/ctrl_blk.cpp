@@ -51,7 +51,7 @@ namespace {
 
   ctrl_blk* make_blk( void* p , const std::size_t sz ){
     struct null_deleter {
-      void operator()( void* p ) {
+      void operator()( void* ) {
       }
     };
     return make_blk( p , sz , null_deleter());

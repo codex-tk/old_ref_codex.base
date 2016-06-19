@@ -4,6 +4,8 @@
 #ifndef __codex_proactor_iocp_h__
 #define __codex_proactor_iocp_h__
 
+#include <codex/codex.hpp>
+
 namespace codex { namespace proactor {
 
   class iocp {
@@ -30,6 +32,8 @@ namespace codex { namespace proactor {
     void unbind( SOCKET fd );
 
     int wait( const int wait_ms );
+
+    void wakeup(void);
   private:
     HANDLE _iocp;
   };

@@ -37,13 +37,21 @@ namespace codex { namespace proactor {
   int iocp::bind( SOCKET fd 
       , void* ctx )
   {
-    return CreateIoCompletionPort( reinterpret_cast< HANDLE >(fd) 
-        , _iocp
-        , reinterpret_cast< ULONG_PTR >( ctx )
-        , 0 ) != NULL ? 0 : -1;
+    HANDLE h = CreateIoCompletionPort(reinterpret_cast<HANDLE>(fd)
+      , _iocp
+      , reinterpret_cast<ULONG_PTR>(ctx)
+      , 0);
+    if (h == _iocp) {
+      return 0;
+    }
+    return -1;
   }
 
   void iocp::unbind( SOCKET ){
+  }
+
+  void iocp::wakeup(void) {
+    ::PostQueuedCompletionStatus(_iocp, -1, 0, nullptr);
   }
 
   int iocp::wait( const int wait_ms ){
@@ -58,15 +66,18 @@ namespace codex { namespace proactor {
         , static_cast<DWORD>(wait_ms)) == TRUE;
 
     if ( overlapped == nullptr ) {
+      if (bytes_transferred == -1)
+        return 1;
       return 0;
     }
     iocp::handler* handler_ptr= 
       static_cast< iocp::handler* >(overlapped);
     std::error_code ec;
     if ( !result ) {
-      ec = std::make_error_code( GetLastError()); 
+      ec = std::error_code(GetLastError(), std::system_category());
     }
-    (*handler_ptr)( key , ec , bytes_transferred );
+    (*handler_ptr)( reinterpret_cast<void*>(key) , ec , static_cast<int>(bytes_transferred) );
+    return 1;
   }
 
 }}

@@ -9,9 +9,33 @@
 
 namespace codex{ namespace io{ namespace ip{
 
-  template < class SocketType >
+  template < 
+#if defined( __codex_win32__ )
+    class SocketType = SOCKET
+#else
+    class SocketType = int
+#endif
+  >
   class socket_ops{
   public:
+    typedef SocketType socket_type;
+
+    static SocketType invalid() {
+#if defined ( __codex_win32__ )
+      return INVALID_SOCKET;
+#else
+      return -1;
+#endif
+    }
+
+    static SocketType socket(int af, int type, int protocol) {
+#if defined ( __codex_win32__ )
+      return ::WSASocketW(af, type, protocol , NULL , NULL , WSA_FLAG_OVERLAPPED );
+#else
+      return ::socket( af , type , protocol);
+#endif
+    }
+    
     static bool blocking( SocketType fd ) {
 #if defined ( __codex_win32__ )
       unsigned long opt = 0;
@@ -60,12 +84,13 @@ namespace codex{ namespace io{ namespace ip{
       return r;
     }
 
-    static void close(SocketType fd) {
+    static void close(SocketType& fd) {
 #if defined ( __codex_win32__ )
       ::closesocket(fd);
 #else
       ::close(fd);
 #endif
+      fd = invalid();
     }
 
     static bool reuseaddr( SocketType fd ) {

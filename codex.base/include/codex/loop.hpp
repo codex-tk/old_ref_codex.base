@@ -9,9 +9,11 @@
 #include <codex/codex.hpp>
 #include <codex/operation.hpp>
 #include <codex/slist.hpp>
-
+#if defined( __codex_win32__ )
+#include <codex/proactor/proactor.hpp>
+#else
 #include <codex/reactor/reactor.hpp>
-
+#endif
 namespace codex{
   
   /**
@@ -19,7 +21,9 @@ namespace codex{
   class loop {
   public:
     typedef codex::operation< void () > operation_type;
-#if defined( __codex_linux__ )
+#if defined( __codex_win32__ )
+    typedef codex::proactor::engine engine_type;
+#else
     typedef codex::reactor::engine engine_type;
 #endif
   public:

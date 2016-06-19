@@ -37,5 +37,8 @@ TEST_F( loop_f , post ){
 
 TEST_F( loop_f , post2 ) {
   loop->post_handler( [] {} );
-  ASSERT_EQ( 2 , loop->dispatch(0));
+  int cnt = loop->dispatch(0);
+  cnt += loop->dispatch(0);
+  cnt += loop->dispatch(0);
+  ASSERT_EQ( 2 , cnt );
 }

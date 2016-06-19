@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
+#if defined ( __codex_linux__ )
 #include <codex/codex.hpp>
 #include <codex/reactor/reactor.hpp>
 #include <codex/pipe.hpp>
 
-#if defined ( __codex_linux__ )
+
 #include <codex/reactor/epoll.hpp>
 #include <codex/reactor/pipe_wakeup.hpp>
 #include <codex/reactor/eventfd_wakeup.hpp>
@@ -14,7 +15,7 @@
 #include <sys/poll.h>
 typedef codex::reactor::epoll poller;
 typedef codex::reactor::eventfd_wakeup wakeup;
-#endif
+
 
 TEST( reactor , event_equal ) {
 #if defined ( __codex_linux__ )
@@ -47,3 +48,4 @@ TEST( reactor , wakeup ) {
   ASSERT_EQ( poll.wait( 100 ) , 0 );
   poll.unbind( wakeup.handle() );
 } 
+#endif

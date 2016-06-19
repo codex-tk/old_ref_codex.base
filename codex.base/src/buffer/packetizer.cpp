@@ -51,7 +51,7 @@ namespace codex { namespace buffer {
 
   }
 
-  int length_packetizer::setup( codex::io::buffer* iobufs , int cnt ) {
+  int length_packetizer::setup( codex::io::buffer* iobufs , int ) {
     if ( _blk.size() == 0 ) {
       _blk = shared_blk(default_buf_size());
     }

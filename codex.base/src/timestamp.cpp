@@ -259,8 +259,9 @@ namespace codex {
   }
 
   filetime::filetime( void ) 
-    : dwHighDateTime(0) , dwLowDateTime(0)
   {
+    dwHighDateTime = 0;
+    dwLowDateTime = 0;
   }
 
   filetime::filetime( const codex::timestamp& ts ) 

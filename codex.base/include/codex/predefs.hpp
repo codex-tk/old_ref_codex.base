@@ -3,6 +3,8 @@
 
 #if defined( _WIN32 )
 
+#define NOMINMAX
+
 #include <WinSock2.h>
 #include <MSWSock.h>
 #include <ws2tcpip.h>
@@ -29,7 +31,7 @@
 #include <memory>
 #include <deque>
 #include <vector>
-
+#include <algorithm>
 #if defined( _WIN32 )
 
 /// @brief win32 predef
