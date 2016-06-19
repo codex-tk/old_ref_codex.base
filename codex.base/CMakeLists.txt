@@ -21,7 +21,12 @@ else()
 endif()
 
 if ( MSVC )
-
+    set( PLATFORM_DEPEND_HEADERS 
+      include/codex/proactor/iocp.hpp
+    )
+    set( PLATFORM_DEPEND_SRCS 
+      proactor/iocp.cpp
+    )
 else()
   if ( APPLE )
     set( PLATFORM_DEPEND_HEADERS 
