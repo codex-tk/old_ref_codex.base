@@ -8,6 +8,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   namespace {
     int k_handle_error_bit = 0x10000000;
+    int k_handle_close_bit = 0x20000000;
   }
 
   event_handler::event_handler(void) {
@@ -33,7 +34,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
     : _fd(ip::socket_ops<>::invalid())
     , _read_handler(&proactor_channel::handle_read0)
     , _write_handler(&proactor_channel::handle_write0)
-    , _ref_count(k_handle_error_bit | 1)
+    , _ref_count(k_handle_close_bit | k_handle_error_bit | 1 )
     , _loop(nullptr)
     , _builder(nullptr)
   {
@@ -57,11 +58,19 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::close(void) {
-    add_ref();
-    _loop->post_handler([this] {
-      handle_error(codex::make_error_code(codex::errc::closed_by_user));
-      release();
-    });
+    if ( _ref_count.load() & k_handle_close_bit) {
+      do {
+        int expected = _ref_count.load();
+        int desired = expected & ~k_handle_close_bit;
+        if ( _ref_count.compare_exchange_strong(expected,desired))
+          break;
+      } while(true);
+      add_ref();
+      _loop->post_handler( [this]{
+          handle_error( codex::make_error_code( codex::errc::closed_by_user ));
+          release();
+      });
+    }
   }
 
   bool proactor_channel::closed(void) {
@@ -91,7 +100,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::reset(void) {
-    _ref_count = k_handle_error_bit | 1;
+    _ref_count = k_handle_close_bit | k_handle_error_bit | 1;
     _fd = ip::socket_ops<>::invalid();
     _write_packets.clear();
     _packetizer.reset();
@@ -100,9 +109,11 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   void proactor_channel::set_builder(proactor_channel_builder* builder) {
     _builder = builder;
   }
+
   void proactor_channel::set_loop(codex::loop* loop) {
     _loop = loop;
   }
+
   void proactor_channel::set_packetizer(
     const std::shared_ptr< codex::buffer::packetizer >& packetizer) {
     _packetizer = packetizer;
@@ -114,7 +125,9 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   void proactor_channel::handle_read(const std::error_code& ec
     , const int io_bytes) {
-
+    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+      return;
+    }
     if (ec) {
       return handle_error(ec);
     }
@@ -136,6 +149,9 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   void proactor_channel::handle_write(const std::error_code& ec
     , const int io_bytes) {
+    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+      return;
+    }
     if (ec) {
       return handle_error(ec);
     }
@@ -173,16 +189,12 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
           break;
       } while (true);
       _loop->engine().impl().unbind(_fd);
+      ip::socket_ops<>::close(_fd);
       if (_handler) {
         _handler->on_error0(ec);
       }
     }
     if (ec == codex::errc::closed_by_user) {
-      if (_fd != ip::socket_ops<>::invalid()) {
-        ip::socket_ops<>::close(_fd);
-      }
-      _packetizer->clear();
-      _write_packets.clear();
       release();
     }
   }
@@ -190,7 +202,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   void proactor_channel::do_read(void) {
     codex::io::buffer buf[32];
     int iovcnt = _packetizer->setup(buf, 32);
-    
+
     _read_handler.reset();
 
     add_ref();

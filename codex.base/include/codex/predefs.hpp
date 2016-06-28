@@ -82,8 +82,25 @@ namespace codex { namespace threading {
   template < class T > using lock_guard = std::lock_guard< T >;
   template < class T > using atomic = std::atomic< T >;
 
-}}
+}
+}
 
+#define DECL_PROP( clazz , type , name )\
+  public:\
+    type name( const type& p );\
+    type name( void );\
+  private:\
+    type _##name;\
+
+#define IMPL_PROP( clazz , type , name )\
+  type clazz::name( const type& p ) {\
+    type old = _##name;\
+    _##name = p;\
+    return old;\
+  }\
+  type clazz::name(void) {\
+    return _##name;\
+  }\
 
 
 #endif
