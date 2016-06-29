@@ -9,6 +9,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   namespace {
     int k_handle_error_bit = 0x10000000;
     int k_handle_close_bit = 0x20000000;
+    int k_counter_mask_bit = 0x0fffffff;
   }
 
   event_handler::event_handler(void) {
@@ -58,23 +59,23 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::close(void) {
-    if ( _ref_count.load() & k_handle_close_bit) {
-      do {
-        int expected = _ref_count.load();
-        int desired = expected & ~k_handle_close_bit;
-        if ( _ref_count.compare_exchange_strong(expected,desired))
-          break;
-      } while(true);
-      add_ref();
-      _loop->post_handler( [this]{
-          handle_error( codex::make_error_code( codex::errc::closed_by_user ));
-          release();
-      });
+    while ( _ref_count.load() & k_handle_close_bit ) {
+      int expected = _ref_count.load();
+      int desired = expected & ~k_handle_close_bit;
+      if ( _ref_count.compare_exchange_strong(expected,desired)) {
+        add_ref();
+        _loop->post_handler( [this]{
+            handle_error( codex::make_error_code( codex::errc::closed_by_user ));
+            release();
+            });
+        return;
+      }
     }
   }
 
   bool proactor_channel::closed(void) {
-    return (_ref_count.load() & k_handle_error_bit) == 0;
+    return ( _ref_count.load() & k_handle_error_bit )  == 0 
+      || ( _ref_count.load() & k_handle_close_bit )  == 0; 
   }
 
   void proactor_channel::write(codex::buffer::shared_blk blk) {
@@ -92,11 +93,14 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   int proactor_channel::release(void) {
-    int cnt = _ref_count.fetch_sub(1);
-    if (cnt == 1) {
-      _builder->on_end_reference(this);
+    if ( (_ref_count.load() & k_counter_mask_bit) > 0 ) {
+      int cnt = _ref_count.fetch_sub(1);
+      if (cnt == 1) {
+        _builder->on_end_reference(this);
+      }
+      return cnt;
     }
-    return cnt;
+    return -1;
   }
 
   void proactor_channel::reset(void) {
@@ -104,6 +108,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
     _fd = ip::socket_ops<>::invalid();
     _write_packets.clear();
     _packetizer.reset();
+    _handler.reset();
   }
 
   void proactor_channel::set_builder(proactor_channel_builder* builder) {
@@ -125,7 +130,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   void proactor_channel::handle_read(const std::error_code& ec
     , const int io_bytes) {
-    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+    if ( closed() ) {
       return;
     }
     if (ec) {
@@ -181,17 +186,15 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::handle_error(const std::error_code& ec) {
-    if (_ref_count.load() & k_handle_error_bit) {
-      do {
-        int expected = _ref_count.load();
-        int desired = expected & ~k_handle_error_bit;
-        if (_ref_count.compare_exchange_strong(expected, desired))
-          break;
-      } while (true);
-      _loop->engine().impl().unbind(_fd);
-      ip::socket_ops<>::close(_fd);
-      if (_handler) {
-        _handler->on_error0(ec);
+    while(_ref_count.load() & k_handle_error_bit) {
+      int expected = _ref_count.load();
+      int desired = expected & ~k_handle_error_bit;
+      if (_ref_count.compare_exchange_strong(expected, desired)){
+        _loop->engine().impl().unbind(_fd);
+        ip::socket_ops<>::close(_fd);
+        if (_handler) {
+          _handler->on_error0(ec);
+        }
       }
     }
     if (ec == codex::errc::closed_by_user) {
@@ -200,7 +203,11 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::do_read(void) {
+    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+      return;
+    }
     codex::io::buffer buf[32];
+
     int iovcnt = _packetizer->setup(buf, 32);
 
     _read_handler.reset();
@@ -227,6 +234,9 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::do_write(void) {
+    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+      return;
+    }
     if (_write_packets.empty())
       return;
     int iovcnt = std::min(static_cast<int>(_write_packets.size()), 32);

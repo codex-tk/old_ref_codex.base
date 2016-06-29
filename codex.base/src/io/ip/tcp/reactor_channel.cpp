@@ -7,9 +7,10 @@
 
 namespace codex { namespace io { namespace ip { namespace tcp {
 
-  namespace {
+ namespace {
     int k_handle_error_bit = 0x10000000;
-    int k_close_bit = 0x20000000;
+    int k_handle_close_bit = 0x20000000;
+    int k_counter_mask_bit = 0x0fffffff;
   }
 
   event_handler::event_handler(void){
@@ -34,7 +35,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   reactor_channel::reactor_channel( void )
     : _fd(ip::socket_ops<int>::invalid())
     , _poll_handler( &reactor_channel::handle_event0 )
-    , _ref_count( k_close_bit | k_handle_error_bit | 1 )
+    , _ref_count(k_handle_close_bit | k_handle_error_bit | 1 )
     , _loop( nullptr )
     , _builder( nullptr )
   {
@@ -56,23 +57,23 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   void reactor_channel::close( void ) {
-    if ( _ref_count.load() & k_close_bit ) {
-      do {
-        int expected = _ref_count.load();
-        int desired = expected & ~k_close_bit;
-        if ( _ref_count.compare_exchange_strong(expected,desired))
-          break;
-      } while(true);
-      add_ref();
-      _loop->post_handler( [this]{
-          handle_error( codex::make_error_code( codex::errc::closed_by_user ));
-          release();
-      });
+    while ( _ref_count.load() & k_handle_close_bit ) {
+      int expected = _ref_count.load();
+      int desired = expected & ~k_handle_close_bit;
+      if ( _ref_count.compare_exchange_strong(expected,desired)) {
+        add_ref();
+        _loop->post_handler( [this]{
+            handle_error( codex::make_error_code( codex::errc::closed_by_user ));
+            release();
+            });
+        return;
+      }
     }
   }
 
   bool reactor_channel::closed( void ) {
-    return ( _ref_count.load() & k_handle_error_bit )  == 0;
+    return ( _ref_count.load() & k_handle_error_bit )  == 0 
+      || ( _ref_count.load() & k_handle_close_bit )  == 0; 
   }
 
   void reactor_channel::write( codex::buffer::shared_blk blk ){
@@ -90,19 +91,22 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   int reactor_channel::release( void ) {
-    int cnt = _ref_count.fetch_sub(1);
-    if ( cnt == 1 ){
-      _builder->on_end_reference(this);
+    if ( (_ref_count.load() & k_counter_mask_bit) > 0 ) {
+      int cnt = _ref_count.fetch_sub(1);
+      if (cnt == 1) {
+        _builder->on_end_reference(this);
+      }
+      return cnt;
     }
-    return cnt;
+    return -1;
   }
 
   void reactor_channel::reset( void ) {
-    _ref_count = k_handle_error_bit | 1;
-    _fd = -1;
+     _ref_count = k_handle_close_bit | k_handle_error_bit | 1;
+    _fd = ip::socket_ops<>::invalid();
     _write_packets.clear();
-    _handler.reset();
     _packetizer.reset();
+    _handler.reset();
   }
 
   void reactor_channel::set_builder( reactor_channel_builder* builder ) {
@@ -121,11 +125,11 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   std::error_code reactor_channel::handle_pollin( void ) {
-    if ( _fd == -1 )
-      return std::make_error_code( std::errc::bad_file_descriptor );
-    if ( (_ref_count.load() & k_handle_error_bit) == 0 ) {
+    if ( closed()) 
       return std::make_error_code( std::errc::owner_dead );
-    }
+
+    if ( _fd == ip::socket_ops<>::invalid() )
+      return std::make_error_code( std::errc::bad_file_descriptor );
 
     codex::io::buffer buf[32];
     int iovcnt = _packetizer->setup( buf , 32 );
@@ -146,27 +150,32 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   std::error_code reactor_channel::handle_pollout( void ) {
-    if ( _fd == -1 )
-      return std::make_error_code( std::errc::bad_file_descriptor );
-    if ( (_ref_count.load() & k_handle_error_bit) == 0 ) {
+    if ( closed()) 
       return std::make_error_code( std::errc::owner_dead );
-    }
+
+    if ( _fd == ip::socket_ops<>::invalid() )
+      return std::make_error_code( std::errc::bad_file_descriptor );
+
     int iovcnt = static_cast<int>( _write_packets.size());
-    codex::io::buffer buf[iovcnt];
-    for ( int i = 0 ; i < iovcnt ; ++i ){
-      buf[i].ptr( static_cast<char*>(_write_packets[i].read_ptr()));
-      buf[i].length( static_cast<int>(_write_packets[i].length()));
-    }
-    int writebytes = codex::io::ip::socket_ops< int >::writev( _fd , buf , iovcnt );
-    if ( writebytes < 0 ) {
-      return std::error_code( errno , std::system_category() );
-    }
-    int on_write = writebytes;
-    while ( writebytes > 0 ) {
-      writebytes -= _write_packets.front().read_skip( writebytes );
-      if ( _write_packets.front().length() == 0 ){
-        _write_packets.pop_front();
+    if ( iovcnt > 0 ) {
+      codex::io::buffer buf[iovcnt];
+      for ( int i = 0 ; i < iovcnt ; ++i ){
+        buf[i].ptr( static_cast<char*>(_write_packets[i].read_ptr()));
+        buf[i].length( static_cast<int>(_write_packets[i].length()));
       }
+      int writebytes = codex::io::ip::socket_ops< int >::writev( _fd , buf , iovcnt );
+      if ( writebytes < 0 ) {
+        return std::error_code( errno , std::system_category() );
+      }
+      int on_write = writebytes;
+      while ( writebytes > 0 ) {
+        writebytes -= _write_packets.front().read_skip( writebytes );
+        if ( _write_packets.front().length() == 0 ){
+          _write_packets.pop_front();
+        }
+      }
+      if ( _handler )
+        _handler->on_write( on_write , _write_packets.empty() );
     }
     int events = _poll_handler.events();
     if ( _write_packets.empty() ) {
@@ -177,8 +186,6 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     if ( events != _poll_handler.events() )
       _loop->engine().reactor().bind( _fd , &_poll_handler );
 
-    if ( _handler )
-      _handler->on_write( on_write , _write_packets.empty() );
     return std::error_code();
   }
 
@@ -188,23 +195,18 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   void reactor_channel::handle_error( const std::error_code& ec ) {
-    if ( _ref_count.load() & k_handle_error_bit) {
-      do {
-        int expected = _ref_count.load();
-        int desired = expected & ~k_handle_error_bit;
-        if ( _ref_count.compare_exchange_strong(expected,desired))
-          break;
-      } while(true);
-      _loop->engine().reactor().unbind( _fd );
-      ip::socket_ops<int>::close( _fd );
-      if ( _handler ) {
-        _handler->on_error0(ec);
+    while ( _ref_count.load() & k_handle_error_bit) {
+      int expected = _ref_count.load();
+      int desired = expected & ~k_handle_error_bit;
+      if ( _ref_count.compare_exchange_strong(expected,desired)){
+        _loop->engine().reactor().unbind( _fd );
+        ip::socket_ops<int>::close( _fd );
+        if ( _handler ) {
+          _handler->on_error0(ec);
+        }
       }
     }
     if ( ec == codex::errc::closed_by_user ) {
-
-      _packetizer->clear();
-      _write_packets.clear();
       release();
     }
   }
