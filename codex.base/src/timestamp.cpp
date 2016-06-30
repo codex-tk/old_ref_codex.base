@@ -255,7 +255,7 @@ namespace codex {
     wMonth    = tm_date.tm_mon + 1;
     wSecond   = tm_date.tm_sec ;
     wYear     = tm_date.tm_year + 1900;
-    wMilliseconds = ( ts.tick() % (1000 * 1000)) / 1000 ;    
+    wMilliseconds = static_cast<uint16_t>(( ts.tick() % (1000 * 1000)) / 1000) ;    
   }
 
   filetime::filetime( void ) 

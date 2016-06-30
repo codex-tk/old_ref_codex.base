@@ -32,7 +32,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     tcp::channel_ptr _channel_ptr;
   };
 
-  class proactor_channel { 
+  class proactor_channel {
   public:
     proactor_channel( void );
     ~proactor_channel( void );
