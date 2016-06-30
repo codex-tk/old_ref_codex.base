@@ -12,7 +12,6 @@
 
 #endif
 
-
 class echo_handler : public codex::io::ip::tcp::event_handler{
 public:
   virtual ~echo_handler( void ){
@@ -51,6 +50,8 @@ int main( int argv , char* argc[] ) {
 #if defined( __codex_win32__ )
   WSAData ws;
   WSAStartup(MAKEWORD(2, 2), &ws);
+#else
+
 #endif
   codex::loop l;
   builder b(l);
