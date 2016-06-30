@@ -100,3 +100,16 @@ TEST( shared_blk , read_write ) {
   ASSERT_EQ( blk.space() , 32 );
   ASSERT_EQ( blk.size() , 32 );
 }
+
+TEST( shared_blk , compact ) {
+  codex::buffer::shared_blk blk(32);
+  blk.write_skip( 10 );
+  ASSERT_EQ( blk.length() , 10 );
+  ASSERT_EQ( blk.space() , 22 );
+  blk.read_skip(5);
+  ASSERT_EQ( blk.length() , 5 );
+  ASSERT_EQ( blk.space() , 22 );
+  blk.compact();
+  ASSERT_EQ( blk.length() , 5 );
+  ASSERT_EQ( blk.space() , 27 );
+}
