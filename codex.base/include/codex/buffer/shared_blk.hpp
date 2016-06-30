@@ -68,6 +68,8 @@ namespace codex { namespace buffer {
      */
     int write( void* p , int sz );
     int read( void* p , int sz );
+
+    void compact( void );
   private:
     void add_ref( void );
     void release( void );

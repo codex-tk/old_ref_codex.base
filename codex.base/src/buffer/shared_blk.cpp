@@ -147,6 +147,14 @@ namespace codex { namespace buffer {
     return read_sz;
   }
 
+  void shared_blk::compact( void ) {
+    int len = length();
+    memmove( static_cast< uint8_t* >(_blk->ptr()) , 
+        read_ptr() , len );
+    _read = 0;
+    _write = len;
+  }
+
   shared_blk reserve( shared_blk blk , const int sz ) {
     if ( static_cast<int>(blk.size()) < sz ) {
       shared_blk nblk( sz );
