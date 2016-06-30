@@ -88,6 +88,7 @@ set( SRCS
     src/timestamp.cpp
     src/timespan.cpp
     src/io/buffer.cpp
+		src/io/ip/socket_ops.cpp
     src/io/ip/tcp/acceptor.cpp
     src/buffer/ctrl_blk.cpp
     src/buffer/shared_blk.cpp

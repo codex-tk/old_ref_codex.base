@@ -12,7 +12,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 #else
     , _poll_handler(&acceptor::handle_event0)
 #endif
-    , _fd( ip::socket_ops<>::invalid() ) 
+    , _fd( ip::socket_ops<>::invalid_socket ) 
   {
     
   }
@@ -25,7 +25,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     close();
     codex::io::ip::tcp::address addr( AF_INET , port );
     _fd = socket_ops<>::socket( addr.family() , addr.type() , addr.protocol() );
-    if ( _fd != socket_ops<>::invalid()) {
+    if ( _fd != socket_ops<>::invalid_socket ) {
       if ( ip::socket_ops<>::nonblocking( _fd ) ) {
         if ( ip::socket_ops<>::reuseaddr( _fd ) ) {
           if ( ip::socket_ops<>::bind( _fd , addr )) {
@@ -48,7 +48,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   void acceptor::close( void ) {
-    if ( _fd != ip::socket_ops<>::invalid()) {
+    if ( _fd != ip::socket_ops<>::invalid_socket ) {
 #if !defined( __codex_win32__)
       _loop.engine().reactor().unbind(_fd);
 #endif

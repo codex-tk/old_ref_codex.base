@@ -33,7 +33,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   reactor_channel::reactor_channel( void )
-    : _fd(ip::socket_ops<int>::invalid())
+    : _fd(ip::socket_ops<int>::invalid_socket)
     , _poll_handler( &reactor_channel::handle_event0 )
     , _ref_count(k_handle_close_bit | k_handle_error_bit | 1 )
     , _loop( nullptr )
@@ -49,10 +49,10 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     return *_loop;
   }
 
-  int reactor_channel::bind( int fd ) {
+  int reactor_channel::bind( io::ip::socket_ops<>::socket_type fd) {
     _fd = fd;
     _poll_handler.events(codex::reactor::pollin);
-    codex::io::ip::socket_ops<int>::nonblocking( _fd );
+    codex::io::ip::socket_ops<>::nonblocking( _fd );
     return _loop->engine().reactor().bind( _fd , &_poll_handler );
   }
 
@@ -103,7 +103,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
   void reactor_channel::reset( void ) {
      _ref_count = k_handle_close_bit | k_handle_error_bit | 1;
-    _fd = ip::socket_ops<>::invalid();
+    _fd = ip::socket_ops<>::invalid_socket;
     _write_packets.clear();
     _packetizer.reset();
     _handler.reset();
@@ -128,7 +128,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     if ( closed()) 
       return std::make_error_code( std::errc::owner_dead );
 
-    if ( _fd == ip::socket_ops<>::invalid() )
+    if ( _fd == ip::socket_ops<>::invalid_socket )
       return std::make_error_code( std::errc::bad_file_descriptor );
 
     codex::io::buffer buf[32];
@@ -153,7 +153,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     if ( closed()) 
       return std::make_error_code( std::errc::owner_dead );
 
-    if ( _fd == ip::socket_ops<>::invalid() )
+    if ( _fd == ip::socket_ops<>::invalid_socket )
       return std::make_error_code( std::errc::bad_file_descriptor );
 
     int iovcnt = static_cast<int>( _write_packets.size());
