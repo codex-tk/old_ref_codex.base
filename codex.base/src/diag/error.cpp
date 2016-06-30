@@ -46,6 +46,14 @@ namespace codex {
     return std::error_condition( static_cast<int>(ec) , codex::category());
   }
 
+  std::error_code last_error( void ) {
+#if defined( __codex_win32__)
+    return std::error_code( GetLastError() , std::system_category());
+#else
+    return std::error_code( errno , std::system_category());
+#endif
+  }
+
 }
 
 namespace std {

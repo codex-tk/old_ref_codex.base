@@ -27,6 +27,8 @@ namespace codex {
 
   std::error_condition make_error_condition( codex::errc ec );
 
+  std::error_code last_error( void );
+
  }
 
 namespace std {

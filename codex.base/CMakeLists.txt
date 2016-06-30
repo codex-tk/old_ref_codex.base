@@ -32,7 +32,7 @@ else()
     )
   endif()
 	  set( PLATFORM_DEPEND_HEADERS
-        {PLATFORM_DEPEND_HEADERS}
+        ${PLATFORM_DEPEND_HEADERS}
         include/codex/pipe.hpp
         include/codex/reactor/reactor.hpp
         include/codex/reactor/pipe_wakeup.hpp
@@ -42,7 +42,7 @@ else()
         include/codex/io/ip/tcp/reactor_channel_builder.hpp
     )
     set( PLATFORM_DEPEND_SRCS
-        {PLATFORM_DEPEND_SRCS}
+        ${PLATFORM_DEPEND_SRCS}
         src/reactor/reactor.cpp
         src/reactor/pipe_wakeup.cpp
         src/reactor/eventfd_wakeup.cpp

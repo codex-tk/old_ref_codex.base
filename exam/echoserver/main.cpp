@@ -3,6 +3,7 @@
 #include <codex/io/ip/tcp/acceptor.hpp>
 #include <codex/io/ip/tcp/channel.hpp>
 #include <codex/log/log.hpp>
+#include <codex/diag/error.hpp>
 
 #if defined( __codex_win32__ )
 
@@ -67,7 +68,6 @@ int main( int argv , char* argc[] ) {
       int cnt  = l.dispatch(1000);
     }
   }
-  LOG_D( "echo" , "Error %s" , std::error_code( GetLastError()
-    , std::system_category()).message().c_str() );
+  LOG_D( "echo" , "Error %s" , codex::last_error().message().c_str() );
   return 0;
 }
