@@ -39,7 +39,8 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
     codex::loop& loop( void );
 
-    int bind( int fd );
+    int bind( io::ip::socket_ops<>::socket_type fd );
+
     void close( void );
     bool closed( void );
 
@@ -47,6 +48,11 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
     int add_ref( void );
     int release( void );
+
+    template < class Option >
+    bool set_option( Option& opt ) {
+      return codex::io::ip::socket_ops<>::setsockopt( _fd , opt );
+    }
   public:
     void reset( void );
     void set_builder( proactor_channel_builder* builder );

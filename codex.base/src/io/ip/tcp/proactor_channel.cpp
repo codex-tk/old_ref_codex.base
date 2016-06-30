@@ -32,7 +32,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   proactor_channel::proactor_channel(void)
-    : _fd(ip::socket_ops<>::invalid())
+    : _fd(ip::socket_ops<>::invalid_socket)
     , _read_handler(&proactor_channel::handle_read0)
     , _write_handler(&proactor_channel::handle_write0)
     , _ref_count(k_handle_close_bit | k_handle_error_bit | 1 )
@@ -49,9 +49,9 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
     return *_loop;
   }
 
-  int proactor_channel::bind(int fd) {
+  int proactor_channel::bind( io::ip::socket_ops<>::socket_type fd) {
     _fd = fd;
-    codex::io::ip::socket_ops<int>::nonblocking(_fd);
+    codex::io::ip::socket_ops<>::nonblocking(_fd);
     if (_loop->engine().impl().bind(_fd, this) < 0)
       return -1;
     do_read();
@@ -105,7 +105,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   void proactor_channel::reset(void) {
     _ref_count = k_handle_close_bit | k_handle_error_bit | 1;
-    _fd = ip::socket_ops<>::invalid();
+    _fd = ip::socket_ops<>::invalid_socket;
     _write_packets.clear();
     _packetizer.reset();
     _handler.reset();

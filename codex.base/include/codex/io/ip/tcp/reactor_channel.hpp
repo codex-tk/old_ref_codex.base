@@ -4,6 +4,7 @@
 #include <codex/codex.hpp>
 #include <codex/reactor/poll_handler.hpp>
 #include <codex/buffer/packetizer.hpp>
+#include <codex/io/ip/socket_ops.hpp>
 
 namespace codex {
   class loop;
@@ -38,7 +39,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
     codex::loop& loop( void );
 
-    int bind( int fd );
+    int bind( io::ip::socket_ops<>::socket_type fd );
     void close( void );
     bool closed( void );
 
@@ -46,6 +47,12 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
     int add_ref( void );
     int release( void );
+
+    template < class Option >
+    bool set_option( Option& opt ) {
+      return codex::io::ip::socket_ops<>::setsockopt( _fd , opt );
+    }
+
   public:
     void reset( void );
     void set_builder( reactor_channel_builder* builder );
@@ -61,7 +68,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     void handle_end_reference( void );
     void write0( codex::buffer::shared_blk blk );
   private:
-    int _fd;
+    io::ip::socket_ops<>::socket_type _fd;
     codex::reactor::poll_handler _poll_handler;
     codex::threading::atomic<int> _ref_count;
     codex::loop* _loop;
