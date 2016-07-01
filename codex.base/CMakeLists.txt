@@ -40,6 +40,7 @@ else()
         include/codex/reactor/poll_handler.hpp
         include/codex/io/ip/tcp/reactor_channel.hpp
         include/codex/io/ip/tcp/reactor_channel_builder.hpp
+        include/codex/reactor/async_layer.hpp
     )
     set( PLATFORM_DEPEND_SRCS
         ${PLATFORM_DEPEND_SRCS}
@@ -49,6 +50,7 @@ else()
         src/reactor/poll_handler.cpp
         src/io/ip/tcp/reactor_channel.cpp
         src/io/ip/tcp/reactor_channel_builder.cpp
+        src/reactor/async_layer.cpp
      )
 
 endif()
