@@ -5,15 +5,13 @@
 
 #include <codex/codex.hpp>
 #include <codex/buffer/packetizer.hpp>
+#include <codex/io/ip/tcp/proactor_channel.hpp>
 
 namespace codex {
   class loop;
 }
 
 namespace codex {  namespace io { namespace ip { namespace tcp {
-
-  class proactor_channel;
-  class event_handler;
 
   class proactor_channel_builder {
   public:

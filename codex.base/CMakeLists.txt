@@ -100,6 +100,7 @@ set( SRCS
     src/log/console_writer.cpp
     src/diag/error.cpp
     ${PLATFORM_DEPEND_SRCS}
+		src/io/ip/tcp/channel.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

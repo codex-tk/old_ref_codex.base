@@ -12,25 +12,9 @@ namespace codex {
 
 namespace codex { namespace io { namespace ip { namespace tcp {
 
+  class event_handler;
   class reactor_channel;
   class reactor_channel_builder;
-
-  typedef std::shared_ptr< reactor_channel > channel_ptr;
-
-  class event_handler {
-  public:
-    event_handler( void );
-    virtual ~event_handler( void );
-    virtual void on_read( codex::buffer::shared_blk blk ) = 0 ;
-    virtual void on_write( const int write_bytes , bool flushed ) = 0;
-    virtual void on_error( const std::error_code& ec ) = 0;
-    
-    void channel_ptr( tcp::channel_ptr ptr );
-    tcp::channel_ptr& channel_ptr( void );
-    void on_error0( const std::error_code& ec );
-  private:
-    tcp::channel_ptr _channel_ptr;
-  };
 
   class reactor_channel { // : public std::enable_shared_from_this {
   public:
@@ -78,6 +62,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     reactor_channel_builder* _builder;
   };
 
+  typedef std::shared_ptr< reactor_channel > channel_ptr;
 
 }}}}
 

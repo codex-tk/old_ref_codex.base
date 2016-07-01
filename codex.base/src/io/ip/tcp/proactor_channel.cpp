@@ -1,4 +1,4 @@
-#include <codex/io/ip/tcp/proactor_channel.hpp>
+#include <codex/io/ip/tcp/channel.hpp>
 #include <codex/loop.hpp>
 #include <codex/log/log.hpp>
 #include <codex/diag/error.hpp>
@@ -12,24 +12,6 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
     int k_counter_mask_bit = 0x0fffffff;
   }
 
-  event_handler::event_handler(void) {
-  }
-
-  event_handler::~event_handler(void) {
-  }
-
-  void event_handler::channel_ptr(tcp::channel_ptr ptr) {
-    _channel_ptr = ptr;
-  }
-
-  tcp::channel_ptr& event_handler::channel_ptr(void) {
-    return _channel_ptr;
-  }
-
-  void event_handler::on_error0(const std::error_code& ec) {
-    on_error(ec);
-    _channel_ptr.reset();
-  }
 
   proactor_channel::proactor_channel(void)
     : _fd(ip::socket_ops<>::invalid_socket)
