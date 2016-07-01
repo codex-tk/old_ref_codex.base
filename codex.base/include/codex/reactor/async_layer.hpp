@@ -12,9 +12,13 @@ namespace codex { namespace reactor {
   class engine;
   class async_layer {
   public:
+    struct descriptor;
+    typedef descriptor* descriptor_type;
+  public:
     async_layer( loop& l , engine& e );
     ~async_layer( void );
 
+       
   private:
     loop& _loop;
     engine& _engine;
