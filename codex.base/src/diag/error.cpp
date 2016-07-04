@@ -11,6 +11,7 @@ namespace codex {
       std::string( "success" ) ,
       std::string( "disconnect" ) ,
       std::string( "closed_by_user" ) ,
+      std::string( "write_buffer_full" ) ,
     };
     if ( ev < static_cast<int>(map.size()) ) 
       return map[ev];

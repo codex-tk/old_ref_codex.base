@@ -14,7 +14,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   reactor_channel::reactor_channel( void )
-    : _fd(ip::socket_ops<int>::invalid_socket)
+    : _fd(ip::socket_ops<>::invalid_socket)
     , _poll_handler( &reactor_channel::handle_event0 )
     , _ref_count(k_handle_close_bit | k_handle_error_bit | 1 )
     , _loop( nullptr )
@@ -58,6 +58,8 @@ namespace codex { namespace io { namespace ip { namespace tcp {
   }
 
   void reactor_channel::write( codex::buffer::shared_blk blk ){
+    if ( closed() )
+      return;
     if ( blk.length() <= 0 )
       return;
     add_ref();
@@ -138,6 +140,9 @@ namespace codex { namespace io { namespace ip { namespace tcp {
       return std::make_error_code( std::errc::bad_file_descriptor );
 
     int iovcnt = static_cast<int>( _write_packets.size());
+    if ( iovcnt > 32 ) 
+      return codex::make_error_code( codex::errc::write_buffer_full );
+
     if ( iovcnt > 0 ) {
       codex::io::buffer buf[iovcnt];
       for ( int i = 0 ; i < iovcnt ; ++i ){
