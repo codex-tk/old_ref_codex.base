@@ -6,11 +6,13 @@ if ( MSVC )
     set( PLATFORM_DEPEND_HEADERS
         include/codex/proactor/iocp.hpp
 				include/codex/proactor/proactor.hpp
+				include/codex/proactor/async_layer.hpp
 				include/codex/io/ip/tcp/proactor_channel.hpp
     )
     set( PLATFORM_DEPEND_SRCS
         src/proactor/iocp.cpp
 				src/proactor/proactor.cpp
+				src/proactor/async_layer.cpp
 				src/io/ip/tcp/proactor_channel.cpp
     )
 else()
@@ -33,20 +35,20 @@ else()
         ${PLATFORM_DEPEND_HEADERS}
         include/codex/pipe.hpp
         include/codex/reactor/reactor.hpp
+        include/codex/reactor/async_layer.hpp
         include/codex/reactor/pipe_wakeup.hpp
         include/codex/reactor/eventfd_wakeup.hpp
         include/codex/reactor/poll_handler.hpp
         include/codex/io/ip/tcp/reactor_channel.hpp
-        include/codex/reactor/async_layer.hpp
     )
     set( PLATFORM_DEPEND_SRCS
         ${PLATFORM_DEPEND_SRCS}
         src/reactor/reactor.cpp
+        src/reactor/async_layer.cpp
         src/reactor/pipe_wakeup.cpp
         src/reactor/eventfd_wakeup.cpp
         src/reactor/poll_handler.cpp
         src/io/ip/tcp/reactor_channel.cpp
-        src/reactor/async_layer.cpp
      )
 
 endif()
@@ -61,6 +63,8 @@ set( HEADERS
     include/codex/timestamp.hpp
     include/codex/timespan.hpp
     include/codex/io/buffer.hpp
+    include/codex/io/operation.hpp
+    include/codex/io/async_layer.hpp
     include/codex/io/ip/address.hpp
     include/codex/io/ip/address.ipp
 		include/codex/io/ip/socket_ops.hpp
@@ -87,6 +91,7 @@ set( SRCS
     src/timestamp.cpp
     src/timespan.cpp
     src/io/buffer.cpp
+    src/io/operation.cpp
 		src/io/ip/socket_ops.cpp
     src/io/ip/tcp/acceptor.cpp
     src/buffer/ctrl_blk.cpp

@@ -4,7 +4,7 @@
 #include <codex/loop.hpp>
 #include <codex/reactor/reactor.hpp>
 #include <codex/reactor/async_layer.hpp>
-
+#include <codex/io/operation.hpp>
 #include <codex/io/ip/socket_ops.hpp>
 
 namespace codex { namespace reactor {
@@ -13,7 +13,7 @@ namespace codex { namespace reactor {
     codex::io::ip::socket_ops<>::socket_type fd;
     poll_handler handler;
     // todo change io_operation 
-    codex::slist< codex::operation< void () > > ops[2];
+    codex::slist< codex::io::operation > ops[2];
 
     descriptor() 
       : handler( &async_layer::descriptor::handle_events )
@@ -28,11 +28,12 @@ namespace codex { namespace reactor {
       for ( int i = 0 ; i < 2 ; ++i ) {
         if ( poll_ev & ev[i] ) {
           while ( ops[i].head() ){
+
             break;
           }
         }
       }
-    }
+   }
 
     static void handle_events( poll_handler* h , const int poll_ev ) {
 
