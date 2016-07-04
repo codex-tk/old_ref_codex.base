@@ -61,6 +61,8 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::write(codex::buffer::shared_blk blk) {
+    if ( closed() )
+      return;
     if (blk.length() <= 0)
       return;
     add_ref();
@@ -112,16 +114,14 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   void proactor_channel::handle_read(const std::error_code& ec
     , const int io_bytes) {
-    if ( closed() ) {
-      return;
-    }
-    if (ec) {
+    if ( closed() )
+      return handle_error(std::make_error_code( std::errc::owner_dead ));
+    if (ec) 
       return handle_error(ec);
-    }
-
-    if (io_bytes <= 0) {
+    if ( _fd == ip::socket_ops<>::invalid_socket ) 
+      return handle_error(std::make_error_code( std::errc::bad_file_descriptor));
+    if (io_bytes <= 0) 
       return handle_error(codex::make_error_code(codex::errc::disconnect));
-    }
 
     _packetizer->assemble(io_bytes);
 
@@ -136,9 +136,9 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
 
   void proactor_channel::handle_write(const std::error_code& ec
     , const int io_bytes) {
-    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+    if ( closed() )
       return;
-    }
+
     if (ec) {
       return handle_error(ec);
     }
@@ -185,9 +185,9 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::do_read(void) {
-    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+    if ( closed() )
       return;
-    }
+
     codex::io::buffer buf[32];
 
     int iovcnt = _packetizer->setup(buf, 32);
@@ -216,14 +216,19 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   }
 
   void proactor_channel::do_write(void) {
-    if ((_ref_count.load() & k_handle_close_bit) == 0) {
+    if ( closed() ) 
       return;
-    }
+
     if (_write_packets.empty())
       return;
-    int iovcnt = std::min(static_cast<int>(_write_packets.size()), 32);
+
+    int cnt = static_cast<int>(_write_packets.size());
+    if ( cnt > 32 ) {
+      return handle_error(codex::make_error_code(codex::errc::write_buffer_full));
+    }
+    
     codex::io::buffer buf[32];
-    for (int i = 0; i < iovcnt; ++i) {
+    for (int i = 0; i < cnt; ++i) {
       buf[i].ptr(static_cast<char*>(_write_packets[i].read_ptr()));
       buf[i].length(static_cast<int>(_write_packets[i].length()));
     }
@@ -235,7 +240,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
     DWORD flag = 0;
     if (WSASend(_fd
       , buf
-      , iovcnt
+      , cnt
       , nullptr
       , flag
       , &_write_handler

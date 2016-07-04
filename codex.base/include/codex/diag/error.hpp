@@ -11,6 +11,7 @@ namespace codex {
     success = 0,
     disconnect ,
     closed_by_user ,
+    write_buffer_full ,
   };
 
   class error_category_impl : public std::error_category {
