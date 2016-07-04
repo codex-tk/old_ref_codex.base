@@ -57,6 +57,7 @@ namespace codex {
       _head = _tail = node;
     } else {
       _tail->next( node );
+      _tail = node;
     }
     node->next( nullptr ); 
   }
@@ -72,7 +73,7 @@ namespace codex {
     if ( _head == _tail ) {
       _head = _tail = nullptr;
     } else {
-      _head = _head->next();
+      _head = static_cast<T*>(_head->next());
     }
     return head;
   }

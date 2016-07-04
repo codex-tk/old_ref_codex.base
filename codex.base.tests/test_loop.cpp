@@ -25,13 +25,17 @@ TEST_F( loop_f , post ){
   int value = 0;
   loop->post( codex::loop::operation_type::wrap( [&] {
         ASSERT_TRUE( loop->in_loop() );
-        value = 1; 
+        value = value + 1; 
+      }));
+  loop->post( codex::loop::operation_type::wrap( [&] {
+        ASSERT_TRUE( loop->in_loop() );
+        value = value + 1; 
       }));
   ASSERT_EQ( value , 0 );
   ASSERT_FALSE( loop->in_loop() );
   loop->dispatch(100);
   ASSERT_FALSE( loop->in_loop() );
-  ASSERT_EQ( value , 1 );
+  ASSERT_EQ( value , 2 );
 }
 
 
