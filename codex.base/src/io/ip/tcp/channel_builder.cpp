@@ -1,30 +1,29 @@
-#include <codex/io/ip/tcp/channel.hpp>
-
+#include <codex/io/ip/tcp/channel_builder.hpp>
 
 namespace codex { namespace io { namespace ip { namespace tcp {
 namespace {
   struct channel_deleter {
-    void operator()( reactor_channel* chan ) {
+    void operator()( tcp::channel* chan ) {
       chan->release();
     }
   };
 }
 
-  reactor_channel_builder::reactor_channel_builder( void ) {
+  channel_builder::channel_builder( void ) {
 
   }
 
-  reactor_channel_builder::~reactor_channel_builder( void ) {
+  channel_builder::~channel_builder( void ) {
 
   }
 
-  std::shared_ptr< codex::buffer::packetizer > reactor_channel_builder::packetizer( void ) {
+  std::shared_ptr< codex::buffer::packetizer > channel_builder::packetizer( void ) {
     return std::make_shared< codex::buffer::random_packetizer >( 1500 );
   }
 
-  channel_ptr reactor_channel_builder::build( void ) {
+  channel_ptr channel_builder::build( void ) {
     static channel_deleter deleter;
-    reactor_channel* chan = nullptr;
+    channel* chan = nullptr;
     do {
       codex::threading::lock_guard< codex::threading::mutex > guard(_lock);
       if ( !_channels.empty() ) {
@@ -33,7 +32,7 @@ namespace {
       }
     } while (0);
     if (chan== nullptr ) {
-      chan = new reactor_channel();
+      chan = new channel();
     }
     chan->add_ref();
     channel_ptr ptr( chan , deleter );
@@ -46,7 +45,7 @@ namespace {
     return ptr;
   }
 
-  void reactor_channel_builder::on_end_reference( reactor_channel* ptr ) {
+  void channel_builder::on_end_reference( channel* ptr ) {
     codex::threading::lock_guard< codex::threading::mutex > guard(_lock);
     ptr->reset();
     _channels.push_back(ptr);

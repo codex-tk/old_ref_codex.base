@@ -2,7 +2,7 @@
 #include <codex/loop.hpp>
 #include <codex/log/log.hpp>
 #include <codex/diag/error.hpp>
-#include <codex/io/ip/tcp/proactor_channel_builder.hpp>
+#include <codex/io/ip/tcp/channel_builder.hpp>
 
 namespace codex { namespace io {  namespace ip {  namespace tcp {
 
@@ -95,7 +95,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
     _handler.reset();
   }
 
-  void proactor_channel::set_builder(proactor_channel_builder* builder) {
+  void proactor_channel::set_builder( channel_builder* builder) {
     _builder = builder;
   }
 

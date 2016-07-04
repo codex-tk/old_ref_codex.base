@@ -7,13 +7,11 @@ if ( MSVC )
         include/codex/proactor/iocp.hpp
 				include/codex/proactor/proactor.hpp
 				include/codex/io/ip/tcp/proactor_channel.hpp
-				include/codex/io/ip/tcp/proactor_channel_builder.hpp
     )
     set( PLATFORM_DEPEND_SRCS
         src/proactor/iocp.cpp
 				src/proactor/proactor.cpp
 				src/io/ip/tcp/proactor_channel.cpp
-				src/io/ip/tcp/proactor_channel_builder.cpp
     )
 else()
   if ( APPLE )
@@ -39,7 +37,6 @@ else()
         include/codex/reactor/eventfd_wakeup.hpp
         include/codex/reactor/poll_handler.hpp
         include/codex/io/ip/tcp/reactor_channel.hpp
-        include/codex/io/ip/tcp/reactor_channel_builder.hpp
         include/codex/reactor/async_layer.hpp
     )
     set( PLATFORM_DEPEND_SRCS
@@ -49,7 +46,6 @@ else()
         src/reactor/eventfd_wakeup.cpp
         src/reactor/poll_handler.cpp
         src/io/ip/tcp/reactor_channel.cpp
-        src/io/ip/tcp/reactor_channel_builder.cpp
         src/reactor/async_layer.cpp
      )
 
@@ -80,6 +76,7 @@ set( HEADERS
     include/codex/diag/error.hpp
     ${PLATFORM_DEPEND_HEADERS}
 		include/codex/io/ip/tcp/channel.hpp
+		include/codex/io/ip/tcp/channel_builder.hpp
   )
 
 
@@ -103,6 +100,7 @@ set( SRCS
     src/diag/error.cpp
     ${PLATFORM_DEPEND_SRCS}
 		src/io/ip/tcp/channel.cpp
+		src/io/ip/tcp/channel_builder.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

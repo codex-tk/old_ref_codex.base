@@ -3,7 +3,7 @@
 #include <codex/io/ip/socket_ops.hpp>
 #include <codex/log/log.hpp>
 #include <codex/diag/error.hpp>
-#include <codex/io/ip/tcp/reactor_channel_builder.hpp>
+#include <codex/io/ip/tcp/channel_builder.hpp>
 
 namespace codex { namespace io { namespace ip { namespace tcp {
 
@@ -92,7 +92,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     _handler.reset();
   }
 
-  void reactor_channel::set_builder( reactor_channel_builder* builder ) {
+  void reactor_channel::set_builder( channel_builder* builder ) {
     _builder = builder;
   }
   void reactor_channel::set_loop( codex::loop* loop ) {

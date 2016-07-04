@@ -13,8 +13,7 @@ namespace codex {
 namespace codex { namespace io { namespace ip { namespace tcp {
 
   class event_handler;
-  class proactor_channel;
-  class proactor_channel_builder;
+  class channel_builder;
 
   class proactor_channel {
   public:
@@ -39,7 +38,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     }
   public:
     void reset( void );
-    void set_builder( proactor_channel_builder* builder );
+    void set_builder( channel_builder* builder );
     void set_loop( codex::loop* loop );
     void set_packetizer( const std::shared_ptr< codex::buffer::packetizer >& packetizer );
     void set_handler( const std::shared_ptr< event_handler >& handler );
@@ -69,7 +68,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     std::shared_ptr< event_handler > _handler;
     std::shared_ptr< codex::buffer::packetizer > _packetizer;
     std::deque< codex::buffer::shared_blk > _write_packets;
-    proactor_channel_builder* _builder;
+    channel_builder* _builder;
   };
 
   typedef std::shared_ptr< proactor_channel > channel_ptr;

@@ -2,6 +2,7 @@
 #include <codex/loop.hpp>
 #include <codex/io/ip/tcp/acceptor.hpp>
 #include <codex/io/ip/tcp/channel.hpp>
+#include <codex/io/ip/tcp/channel_builder.hpp>
 #include <codex/log/log.hpp>
 #include <codex/diag/error.hpp>
 
