@@ -10,14 +10,20 @@
 namespace codex { namespace reactor {
 
   struct async_layer::descriptor {
-    codex::io::ip::socket_ops<>::socket_type fd;
+    int fd;
     poll_handler handler;
-    // todo change io_operation 
+    async_layer* layer;
     codex::slist< codex::io::operation > ops[2];
 
-    descriptor() 
-      : handler( &async_layer::descriptor::handle_events )
+    descriptor( async_layer* l , int native_fd ) 
+      : fd ( native_fd )
+      , handler( &async_layer::descriptor::handle_events )
+      , layer(l)
     {
+    }
+
+    ~descriptor( void ) {
+
     }
 
     void handle_events( const int poll_ev ) {
@@ -27,16 +33,21 @@ namespace codex { namespace reactor {
       };
       for ( int i = 0 ; i < 2 ; ++i ) {
         if ( poll_ev & ev[i] ) {
-          while ( ops[i].head() ){
-
-            break;
+          io::operation* op = ops[i].head();
+          while( op ) {
+            if ( !(*op)( layer )) 
+              break;
+            ops[i].remove_head();
+            (*op)();
+            op = ops[i].head();
           }
         }
       }
-   }
+    }
 
     static void handle_events( poll_handler* h , const int poll_ev ) {
-
+      descriptor* desc = codex::container_of( h , &descriptor::handler );
+      desc->handle_events( poll_ev );
     }
   };
 
@@ -49,4 +60,7 @@ namespace codex { namespace reactor {
 
   }
 
+  async_layer::descriptor_type async_layer::wrap( int native_fd ) {
+    return std::make_shared< descriptor >(this,native_fd);
+  }
 }}

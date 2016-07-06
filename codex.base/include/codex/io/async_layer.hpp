@@ -17,7 +17,6 @@ typedef codex::proactor::async_layer async_layer;
 typedef codex::reactor::async_layer async_layer;
 #endif
 
-
 }}
 
 #endif
