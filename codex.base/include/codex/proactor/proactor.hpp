@@ -5,8 +5,6 @@
 
 #include <codex/codex.hpp>
 #include <codex/proactor/iocp.hpp>
-#include <codex/io/ip/tcp/proactor_channel.hpp>
-#include <codex/io/ip/tcp/proactor_channel_builder.hpp>
 
 namespace codex { namespace proactor {
 
@@ -17,7 +15,6 @@ namespace codex { namespace proactor {
 #elif defined( __codex_win32__ )
   typedef codex::proactor::iocp impl;
 #endif
-
 
   class engine{
   public:

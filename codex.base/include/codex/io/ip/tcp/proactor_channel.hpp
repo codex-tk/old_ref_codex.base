@@ -2,9 +2,9 @@
 #define __codex_io_ip_tcp_proactor_channel_h__
 
 #include <codex/codex.hpp>
-#include <codex/proactor/proactor.hpp>
 #include <codex/buffer/packetizer.hpp>
 #include <codex/io/ip/socket_ops.hpp>
+#include <codex/proactor/iocp.hpp>
 
 namespace codex {
   class loop;
@@ -53,8 +53,8 @@ namespace codex { namespace io { namespace ip { namespace tcp {
       , const int io_bytes);
     void handle_write(const std::error_code& ec
       , const int io_bytes);
+
     void handle_error( const std::error_code& ec );
-    void handle_end_reference( void );
     void write0( codex::buffer::shared_blk blk );
 
     void do_read(void);
