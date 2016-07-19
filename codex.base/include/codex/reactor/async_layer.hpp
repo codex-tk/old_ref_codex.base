@@ -20,6 +20,15 @@ namespace codex { namespace reactor {
     descriptor_type wrap( int native_fd );
        
     codex::loop& loop( void );
+
+  public:
+    template < class Handler >
+    void connect( descriptor_type& desc , 
+        const codex::io::ip::tcp::address& address , 
+        Handler&& handler )
+    {
+    }
+
   private:
     codex::loop& _loop;
   };

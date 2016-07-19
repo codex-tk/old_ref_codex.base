@@ -15,11 +15,18 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     socket( codex::loop& l );
     ~socket( void );
 
-    // todo
-    void connect( );
+    template < class Handler >
+    void connect( const codex::io::ip::tcp::address& addr 
+        , Handler&& handler ){
+      _loop.async_layer().connect( _descriptor 
+          , addr 
+          , std::forward< Handler >(handler));
+    }
 
-    // todo
-    void accept( socket& fd );
+    template < class Handler >
+    void accept( socket& fd , Handler&& handler ){
+      //
+    }
 
   private:
     codex::loop& _loop;

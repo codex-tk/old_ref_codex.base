@@ -21,6 +21,15 @@ namespace codex { namespace proactor{
     descriptor_type wrap( SOCKET native_fd );
        
     codex::loop& loop( void );
+
+  public:
+    template < class Handler >
+    void connect( descriptor_type& desc , 
+        const codex::io::ip::tcp::address& address , 
+        Handler&& handler )
+    {
+    }
+
   private:
     codex::loop& _loop;
   };

@@ -139,7 +139,7 @@ namespace codex{ namespace io{ namespace ip{
     }
 
     class option {
-    private:
+    public:
       template < typename T , int level , int opt > class value_option {
       public:
         value_option( void ) {
