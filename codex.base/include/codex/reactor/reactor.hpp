@@ -8,8 +8,9 @@
 #if defined( __codex_linux__ )
 #include <codex/reactor/epoll.hpp>
 #include <codex/reactor/eventfd_wakeup.hpp>
-#else
-
+#elif defined( __codex_apple__ )
+#include <codex/reactor/kqueue.hpp>
+#include <codex/reactor/pipe_wakeup.hpp>
 #endif
 
 namespace codex { namespace reactor {
@@ -18,7 +19,8 @@ namespace{
   typedef codex::reactor::epoll poller;
   typedef codex::reactor::eventfd_wakeup wakeup; 
 #elif defined( __codex_apple__ )
-
+  typedef codex::reactor::kqueue poller;
+  typedef codex::reactor::pipe_wakeup wakeup;
 #elif defined( __codex_win32__ )
 
 #endif

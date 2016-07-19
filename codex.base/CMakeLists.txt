@@ -26,9 +26,11 @@ else()
   else()
     set( PLATFORM_DEPEND_HEADERS
       include/codex/reactor/epoll.hpp
+      include/codex/reactor/eventfd_wakeup.hpp
     )
     set( PLATFORM_DEPEND_SRCS
       src/reactor/epoll.cpp
+      src/reactor/eventfd_wakeup.cpp
     )
   endif()
 	  set( PLATFORM_DEPEND_HEADERS
@@ -37,16 +39,15 @@ else()
         include/codex/reactor/reactor.hpp
         include/codex/reactor/async_layer.hpp
         include/codex/reactor/pipe_wakeup.hpp
-        include/codex/reactor/eventfd_wakeup.hpp
         include/codex/reactor/poll_handler.hpp
         include/codex/io/ip/tcp/reactor_channel.hpp
     )
     set( PLATFORM_DEPEND_SRCS
         ${PLATFORM_DEPEND_SRCS}
+        src/pipe.cpp
         src/reactor/reactor.cpp
         src/reactor/async_layer.cpp
         src/reactor/pipe_wakeup.cpp
-        src/reactor/eventfd_wakeup.cpp
         src/reactor/poll_handler.cpp
         src/io/ip/tcp/reactor_channel.cpp
      )

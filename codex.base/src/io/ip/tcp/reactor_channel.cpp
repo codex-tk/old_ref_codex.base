@@ -144,7 +144,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
       return codex::make_error_code( codex::errc::write_buffer_full );
 
     if ( iovcnt > 0 ) {
-      codex::io::buffer buf[iovcnt];
+      codex::io::buffer buf[32];
       for ( int i = 0 ; i < iovcnt ; ++i ){
         buf[i].ptr( static_cast<char*>(_write_packets[i].read_ptr()));
         buf[i].length( static_cast<int>(_write_packets[i].length()));

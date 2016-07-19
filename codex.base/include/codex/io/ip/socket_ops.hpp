@@ -191,8 +191,10 @@ namespace codex{ namespace io{ namespace ip{
       typedef value_option< uint8_t , IPPROTO_IPV6  , IPV6_MULTICAST_LOOP > multi_cast_loop_ipv6;
       typedef value_option< uint8_t , IPPROTO_IPV6  , IPV6_MULTICAST_HOPS > multi_cast_ttl_ipv6;
       typedef value_option< in6_addr  , IPPROTO_IPV6  , IPV6_MULTICAST_IF   > multi_cast_if_ipv6;
+#if !defined( __codex_apple__ )
       typedef value_option< ipv6_mreq , IPPROTO_IPV6  , IPV6_ADD_MEMBERSHIP > multi_cast_join_ipv6;
       typedef value_option< ipv6_mreq , IPPROTO_IPV6  , IPV6_DROP_MEMBERSHIP  > multi_cast_drop_ipv6;
+#endif
 
       typedef value_option< int , IPPROTO_TCP , TCP_NODELAY   > tcp_no_delay;
 #if defined( __codex_win32_h__ )

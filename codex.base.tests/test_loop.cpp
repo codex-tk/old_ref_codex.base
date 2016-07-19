@@ -40,9 +40,14 @@ TEST_F( loop_f , post ){
 
 
 TEST_F( loop_f , post2 ) {
-  loop->post_handler( [] {} );
+  int val = 0;
+  loop->post_handler( [&] 
+      {
+        val = 1;
+      } );
   int cnt = loop->dispatch(0);
   cnt += loop->dispatch(0);
   cnt += loop->dispatch(0);
   ASSERT_EQ( 2 , cnt );
+  ASSERT_EQ( 1 , val );
 }

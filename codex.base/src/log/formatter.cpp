@@ -22,10 +22,11 @@ namespace codex { namespace log {
     }
 #if defined( __codex_win32__ )
     int len = _snprintf_s(reinterpret_cast<char*>( buf.write_ptr()) , buf.space() , _TRUNCATE
+          , "[%04d%02d%02d %02d%02d%02d][%c][%s][%s][%s][%s:%d][%d]\n"
 #else
     int len = snprintf(reinterpret_cast<char*>( buf.write_ptr()) , buf.space() 
+          , "[%04d%02d%02d %02d%02d%02d][%c][%s][%s][%s][%s:%d][%p]\n"
 #endif
-          , "[%04d%02d%02d %02d%02d%02d][%c][%s][%s][%s][%s:%d][%d]\n"
           , st.wYear , st.wMonth , st.wDay , st.wHour , st.wMinute , st.wSecond
           , acronym(r.type)
           , r.tag
@@ -33,7 +34,7 @@ namespace codex { namespace log {
           , r.function
           , r.file
           , r.line
-          , static_cast<int>(r.tid)
+          , r.tid
       );
     buf.write_skip( len );
   }
