@@ -14,6 +14,8 @@
 #else
 #include <codex/reactor/reactor.hpp>
 #endif
+#include <codex/io/async_layer.hpp>
+
 namespace codex{
   
   /**
@@ -63,6 +65,7 @@ namespace codex{
     std::thread::id _loop_id;
     codex::slist< operation_type > _ops;
     codex::slist< operation_type > _in_loop_ops;
+    codex::io::async_layer _async_layer;
   };
 }
 

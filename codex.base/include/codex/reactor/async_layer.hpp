@@ -9,20 +9,19 @@ namespace codex {
 
 namespace codex { namespace reactor {
 
-  class engine;
   class async_layer {
   public:
     struct descriptor;
     typedef std::shared_ptr< descriptor > descriptor_type;
   public:
-    async_layer( loop& l , engine& e );
+    async_layer( codex::loop& l );
     ~async_layer( void );
 
     descriptor_type wrap( int native_fd );
        
+    codex::loop& loop( void );
   private:
-    loop& _loop;
-    engine& _engine;
+    codex::loop& _loop;
   };
 
 }}

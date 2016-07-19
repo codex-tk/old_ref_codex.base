@@ -5,6 +5,7 @@
 namespace codex{
 
   loop::loop( void )
+    : _async_layer(*this)
   {
   }
 

@@ -21,6 +21,9 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
   class acceptor {
   public:
+    typedef std::function< void ( codex::io::ip::socket_ops<>::socket_type fd 
+        , const codex::io::ip::tcp::address& addr ) > on_accept_handler;
+  public:
     acceptor( codex::loop& l );
     ~acceptor( void );
 
@@ -29,7 +32,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
     template < class Handler >
     void set_on_accept( Handler&& h ) {
-      _on_accept = std::function< void ( int fd , const codex::io::ip::tcp::address& addr ) >( 
+      _on_accept = on_accept_handler( 
           std::forward< Handler >( h ));
     }
   private:
@@ -51,7 +54,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     codex::reactor::poll_handler _poll_handler;
 #endif
     codex::io::ip::socket_ops<>::socket_type _fd;
-    std::function< void ( int fd , const codex::io::ip::tcp::address& addr ) > _on_accept;
+    on_accept_handler _on_accept;
   };
 
 }}}}

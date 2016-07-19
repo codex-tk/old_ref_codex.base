@@ -31,6 +31,7 @@ namespace codex { namespace reactor {
         codex::reactor::poll_events::pollin ,
         codex::reactor::poll_events::pollout 
       };
+      int remain_ev = 0;
       for ( int i = 0 ; i < 2 ; ++i ) {
         if ( poll_ev & ev[i] ) {
           io::operation* op = ops[i].head();
@@ -42,7 +43,14 @@ namespace codex { namespace reactor {
             op = ops[i].head();
           }
         }
+        if ( ops[i].head() ){
+          remain_ev |= ev[i];
+        }
       }
+      if ( handler.events() != remain_ev ) {
+        handler.events(remain_ev);
+      }
+      layer->loop().engine().reactor().bind( fd , &handler );
     }
 
     static void handle_events( poll_handler* h , const int poll_ev ) {
@@ -51,8 +59,8 @@ namespace codex { namespace reactor {
     }
   };
 
-  async_layer::async_layer( loop& l , engine& e )
-    : _loop(l) , _engine(e)
+  async_layer::async_layer( codex::loop& l )
+    : _loop(l)
   {
   }
 
@@ -62,5 +70,9 @@ namespace codex { namespace reactor {
 
   async_layer::descriptor_type async_layer::wrap( int native_fd ) {
     return std::make_shared< descriptor >(this,native_fd);
+  }
+
+  codex::loop& async_layer::loop( void ) {
+    return _loop;
   }
 }}
