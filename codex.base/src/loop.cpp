@@ -73,4 +73,5 @@ namespace codex{
   bool loop::in_loop( void ) {
     return _loop_id == std::this_thread::get_id();
   }
+
 }
