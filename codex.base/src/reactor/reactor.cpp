@@ -3,19 +3,19 @@
 namespace codex { namespace reactor {
 
   engine::engine( void ) {
-    _poller.bind( _wakeup.handle() , _wakeup.handler() );
+    _implementation.bind( _wakeup.handle() , _wakeup.handler() );
   }
 
   engine::~engine( void ) {
-    _poller.unbind( _wakeup.handle());
+    _implementation.unbind( _wakeup.handle());
   }
 
-  poller& engine::reactor( void ) {
-    return _poller;
+  reactor::implementation_type& engine::implementation( void ) {
+    return _implementation;
   }
 
   int engine::wait( const int waitms ) {
-    return _poller.wait( waitms );
+    return _implementation.wait( waitms );
   }
 
   void engine::wakeup( void ) {

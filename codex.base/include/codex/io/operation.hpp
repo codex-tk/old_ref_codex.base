@@ -2,7 +2,7 @@
  */
 #ifndef __codex_io_operation_h__
 #define __codex_io_operation_h__
-
+/*
 #include <codex/operation.hpp>
 #include <codex/io/async_layer.hpp>
 
@@ -26,5 +26,5 @@ private:
 };
 
 }}
-
+*/
 #endif

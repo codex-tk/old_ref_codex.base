@@ -1,5 +1,5 @@
 #include <codex/io/operation.hpp>
-
+/*
 namespace codex { namespace io {
 
   operation::operation( io_execute_fp iofn 
@@ -19,3 +19,4 @@ namespace codex { namespace io {
   }
 
 }}
+*/

@@ -33,7 +33,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
   int proactor_channel::bind( io::ip::socket_ops<>::socket_type fd) {
     _fd = fd;
     codex::io::ip::socket_ops<>::nonblocking(_fd);
-    if (_loop->engine().impl().bind(_fd, this) < 0)
+    if (_loop->engine().implementation().bind(_fd, this) < 0)
       return -1;
     do_read();
     return 0;
@@ -171,7 +171,7 @@ namespace codex { namespace io {  namespace ip {  namespace tcp {
       int expected = _ref_count.load();
       int desired = expected & ~k_handle_error_bit;
       if (_ref_count.compare_exchange_strong(expected, desired)){
-        _loop->engine().impl().unbind(_fd);
+        _loop->engine().implementation().unbind(_fd);
         ip::socket_ops<>::close(_fd);
         if (_handler) {
           _handler->on_error0(ec);

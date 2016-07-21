@@ -34,7 +34,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
     _fd = fd;
     _poll_handler.events(codex::reactor::pollin);
     codex::io::ip::socket_ops<>::nonblocking( _fd );
-    return _loop->engine().reactor().bind( _fd , &_poll_handler );
+    return _loop->engine().implementation().bind( _fd , &_poll_handler );
   }
 
   void reactor_channel::close( void ) {
@@ -170,7 +170,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
       _poll_handler.set( codex::reactor::pollout );
     }
     if ( events != _poll_handler.events() )
-      _loop->engine().reactor().bind( _fd , &_poll_handler );
+      _loop->engine().implementation().bind( _fd , &_poll_handler );
 
     return std::error_code();
   }
@@ -186,7 +186,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
       int desired = expected & ~k_handle_error_bit;
       if ( _ref_count.compare_exchange_strong(expected,desired)){
         _poll_handler.events(0);
-        _loop->engine().reactor().unbind( _fd );
+        _loop->engine().implementation().unbind( _fd );
         ip::socket_ops<int>::close( _fd );
         if ( _handler ) {
           _handler->on_error0(ec);

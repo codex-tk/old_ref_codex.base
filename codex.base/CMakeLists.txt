@@ -6,13 +6,11 @@ if ( MSVC )
     set( PLATFORM_DEPEND_HEADERS
         include/codex/proactor/iocp.hpp
 				include/codex/proactor/proactor.hpp
-				include/codex/proactor/async_layer.hpp
 				include/codex/io/ip/tcp/proactor_channel.hpp
     )
     set( PLATFORM_DEPEND_SRCS
         src/proactor/iocp.cpp
 				src/proactor/proactor.cpp
-				src/proactor/async_layer.cpp
 				src/io/ip/tcp/proactor_channel.cpp
     )
 else()
@@ -37,7 +35,6 @@ else()
         ${PLATFORM_DEPEND_HEADERS}
         include/codex/pipe.hpp
         include/codex/reactor/reactor.hpp
-        include/codex/reactor/async_layer.hpp
         include/codex/reactor/pipe_wakeup.hpp
         include/codex/reactor/poll_handler.hpp
         include/codex/io/ip/tcp/reactor_channel.hpp
@@ -46,7 +43,6 @@ else()
         ${PLATFORM_DEPEND_SRCS}
         src/pipe.cpp
         src/reactor/reactor.cpp
-        src/reactor/async_layer.cpp
         src/reactor/pipe_wakeup.cpp
         src/reactor/poll_handler.cpp
         src/io/ip/tcp/reactor_channel.cpp
@@ -65,7 +61,6 @@ set( HEADERS
     include/codex/timespan.hpp
     include/codex/io/buffer.hpp
     include/codex/io/operation.hpp
-    include/codex/io/async_layer.hpp
     include/codex/io/ip/address.hpp
     include/codex/io/ip/address.ipp
 		include/codex/io/ip/socket_ops.hpp
@@ -82,7 +77,6 @@ set( HEADERS
     ${PLATFORM_DEPEND_HEADERS}
 		include/codex/io/ip/tcp/channel.hpp
 		include/codex/io/ip/tcp/channel_builder.hpp
-    include/codex/io/ip/tcp/socket.hpp
   )
 
 
@@ -108,7 +102,6 @@ set( SRCS
     ${PLATFORM_DEPEND_SRCS}
 		src/io/ip/tcp/channel.cpp
 		src/io/ip/tcp/channel_builder.cpp
-    src/io/ip/tcp/socket.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )

@@ -31,11 +31,11 @@ namespace codex { namespace io { namespace ip { namespace tcp {
           if ( ip::socket_ops<>::bind( _fd , addr )) {
             if( ip::socket_ops<>::listen( _fd , SOMAXCONN ) ){
 #if defined( __codex_win32__)
-              _loop.engine().impl().bind(_fd, this);
+              _loop.engine().implementation().bind(_fd, this);
               do_accept();
 #else
               _poll_handler.events(codex::reactor::pollin);
-              _loop.engine().reactor().bind( _fd , &_poll_handler );
+              _loop.engine().implementation().bind( _fd , &_poll_handler );
 #endif
               return 0;
             }
@@ -49,9 +49,7 @@ namespace codex { namespace io { namespace ip { namespace tcp {
 
   void acceptor::close( void ) {
     if ( _fd != ip::socket_ops<>::invalid_socket ) {
-#if !defined( __codex_win32__)
-      _loop.engine().reactor().unbind(_fd);
-#endif
+      _loop.engine().implementation().unbind(_fd);
       ip::socket_ops<>::close(_fd);
     }
   }

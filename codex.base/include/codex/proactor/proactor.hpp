@@ -13,7 +13,7 @@ namespace codex { namespace proactor {
 #elif defined( __codex_apple__ )
 
 #elif defined( __codex_win32__ )
-  typedef codex::proactor::iocp impl;
+  typedef codex::proactor::iocp implementation_type;
 #endif
 
   class engine{
@@ -21,12 +21,12 @@ namespace codex { namespace proactor {
     engine( void );
     ~engine( void );
 
-    impl& impl( void );
+    implementation_type& implementation( void );
 
     int wait( const int waitms );
     void wakeup( void );
   private:
-    proactor::impl _impl;
+    proactor::implementation_type _implementation;
   };
 
 }}

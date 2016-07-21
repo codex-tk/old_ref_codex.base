@@ -14,29 +14,27 @@
 #endif
 
 namespace codex { namespace reactor {
-namespace{
 #if defined( __codex_linux__ )
-  typedef codex::reactor::epoll poller;
+  typedef codex::reactor::epoll implementation_type;
   typedef codex::reactor::eventfd_wakeup wakeup; 
 #elif defined( __codex_apple__ )
-  typedef codex::reactor::kqueue poller;
+  typedef codex::reactor::kqueue implementation_type;
   typedef codex::reactor::pipe_wakeup wakeup;
 #elif defined( __codex_win32__ )
 
 #endif
-}
 
   class engine{
   public:
     engine( void );
     ~engine( void );
 
-    poller& reactor( void );
+    reactor::implementation_type& implementation(void);
 
     int wait( const int waitms );
     void wakeup( void );
   private:
-    reactor::poller _poller;
+    reactor::implementation_type _implementation;
     reactor::wakeup _wakeup;
   };
 

@@ -14,7 +14,6 @@
 #else
 #include <codex/reactor/reactor.hpp>
 #endif
-#include <codex/io/async_layer.hpp>
 
 namespace codex{
   
