@@ -46,8 +46,8 @@ else()
         src/reactor/pipe_wakeup.cpp
         src/reactor/poll_handler.cpp
         src/io/ip/tcp/reactor_channel.cpp
+        src/io/async_layer_reactor.cpp
      )
-
 endif()
 
 set( HEADERS
@@ -77,6 +77,7 @@ set( HEADERS
     ${PLATFORM_DEPEND_HEADERS}
 		include/codex/io/ip/tcp/channel.hpp
 		include/codex/io/ip/tcp/channel_builder.hpp
+    include/codex/io/async_layer.hpp
   )
 
 
