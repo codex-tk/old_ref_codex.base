@@ -30,6 +30,11 @@ namespace codex{ namespace io{ namespace ip{
       return ::socket( af , type , protocol);
 #endif
     }
+
+    template < class Address >
+    static SocketType socket( Address& addr ) {
+      return socket_ops::socket( addr.family() , addr.type() , addr.protocol() );
+    }
     
     static bool blocking( SocketType fd ) {
 #if defined ( __codex_win32__ )
@@ -51,16 +56,20 @@ namespace codex{ namespace io{ namespace ip{
 #endif
     }
 
-    template < class Address >
-    static bool connect( SocketType fd , const Address& addr ){
+    static bool connect( SocketType fd , struct sockaddr* addr_ptr , socklen_t addr_len ){
       int r = -1;
       do {
-        r = ::connect( fd , addr.sockaddr() , addr.length() );
+        r = ::connect( fd , addr_ptr , addr_len );
       } while ((r==-1) && (errno == EINTR ));
       if ( ( r == 0 ) || ( errno == EINPROGRESS ) ) {
         return true;
       }
       return false;
+    }
+
+    template < class Address >
+    static bool connect( SocketType fd , const Address& addr ){
+      return connect( fd , addr.sockaddr() , addr.length());
     }
 
     static int writev( SocketType fd , const codex::io::buffer* buf , int cnt ) {

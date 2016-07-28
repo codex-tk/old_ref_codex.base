@@ -25,6 +25,8 @@ add_executable( codex.base.tests
   test_buffer.cpp
   test_error.cpp
   test_async_layer.cpp
+  test_async_socket.cpp
+  test_misc.cpp
 )
 
 target_link_libraries( codex.base.tests

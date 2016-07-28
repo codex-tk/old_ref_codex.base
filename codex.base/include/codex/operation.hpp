@@ -13,10 +13,10 @@ namespace codex {
   template < class R , class ...Args>
   class operation< R ( Args... ) > {
   public:
-    typedef R (*execute_fp)( operation* op , Args... );
+    typedef R (*handler_type)( operation* op , Args... );
   public:
-    operation( execute_fp fp )
-      : _execute( fp )
+    operation( handler_type handler )
+      : _handler( handler )
     {
     }
 
@@ -25,8 +25,8 @@ namespace codex {
 
     R operator()( Args&&... arg ) {
       //cassert( _execute != nullptr );
-      if ( _execute )
-        return _execute( this , std::forward< Args >(arg)... );
+      if ( _handler )
+        return _handler( this , std::forward< Args >(arg)... );
       return R();
     }
 
@@ -38,7 +38,7 @@ namespace codex {
       return op;
     }
   private:
-    execute_fp _execute;
+    handler_type _handler;
     operation* _next;
   public:
     template < class Handler >

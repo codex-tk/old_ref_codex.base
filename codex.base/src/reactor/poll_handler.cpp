@@ -2,8 +2,8 @@
 
 namespace codex { namespace reactor {
 
-  poll_handler::poll_handler( callback cb )
-    : _callback( cb )
+  poll_handler::poll_handler( handler cb )
+    : _handler( cb )
   {
   }
 
@@ -12,9 +12,9 @@ namespace codex { namespace reactor {
   }
 
   void poll_handler::operator()( int polls ) {
-    //cassert( _callback != nullptr );
-    if ( _callback )
-      _callback( this , polls );
+    //cassert( _handler != nullptr );
+    if ( _handler )
+      _handler( this , polls );
   }
 
   int poll_handler::events( void ) {

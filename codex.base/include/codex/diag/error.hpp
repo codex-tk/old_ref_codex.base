@@ -12,6 +12,7 @@ namespace codex {
     disconnect ,
     closed_by_user ,
     write_buffer_full ,
+    bad_file_descriptor ,
   };
 
   class error_category_impl : public std::error_category {

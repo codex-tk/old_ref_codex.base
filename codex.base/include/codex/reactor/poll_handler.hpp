@@ -14,8 +14,8 @@ namespace codex { namespace reactor {
 
   class poll_handler {
   public:
-    typedef void (*callback)( poll_handler* handler , const int polls );
-    poll_handler( callback cb );
+    typedef void (*handler)( poll_handler* handler , const int polls );
+    poll_handler( handler cb );
     ~poll_handler( void );
     void operator()( int polls );
 
@@ -25,7 +25,7 @@ namespace codex { namespace reactor {
     void set( poll_events e );
     void clear( poll_events e );
   private:
-    callback _callback;
+    handler _handler;
     int _events;
   };
 

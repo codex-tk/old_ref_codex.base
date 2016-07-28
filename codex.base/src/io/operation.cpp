@@ -1,22 +1,33 @@
 #include <codex/io/operation.hpp>
-/*
 namespace codex { namespace io {
 
-  operation::operation( io_execute_fp iofn 
-      , codex::operation< void () >::execute_fp handler_fn )
-    : codex::operation< void () >(handler_fn)
-    , _io_execute( iofn )
+  operation::operation( codex::operation< void () >::handler_type handler 
+      , io_handler_type io_handler
+      , const codex::io::async_layer::descriptor_type& fd )
+    : codex::operation< void () >( handler )
+    , _io_handler( io_handler )
+    , _fd( fd )
   {
-  }
 
+  }
   operation::~operation( void ){
+
   }
 
-  bool operation::operator()( async_layer* layer ){
-    if ( _io_execute ) 
-      return _io_execute( this , layer );
-    return false;
+  bool operation::handle_io( void ){
+    if ( _io_handler )
+      return _io_handler(this);
+    return true;
+  }
+
+  void operation::error( const std::error_code& ec ){
+    _error = ec;
+  }
+
+  std::error_code operation::error( void ){
+    return _error;
   }
 
 }}
-*/
+
+

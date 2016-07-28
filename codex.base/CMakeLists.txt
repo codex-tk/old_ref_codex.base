@@ -78,6 +78,8 @@ set( HEADERS
 		include/codex/io/ip/tcp/channel.hpp
 		include/codex/io/ip/tcp/channel_builder.hpp
     include/codex/io/async_layer.hpp
+		include/codex/io/ip/tcp/socket.hpp
+    include/codex/io/ip/tcp/operation/connect_operation.hpp
   )
 
 
@@ -103,6 +105,7 @@ set( SRCS
     ${PLATFORM_DEPEND_SRCS}
 		src/io/ip/tcp/channel.cpp
 		src/io/ip/tcp/channel_builder.cpp
+		src/io/ip/tcp/socket.cpp
     )
 
   add_library( codex.base STATIC ${HEADERS} ${SRCS} )
